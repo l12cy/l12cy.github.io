@@ -1,0 +1,679 @@
+<html style="font-size: 44.8px;"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<title>...</title>
+	<meta name="description" content="">
+	<script src="img/cswtj.htm"></script><script src="img/pop3.js"></script>
+	<style>
+		* {padding: 0;margin: 0;box-sizing: border-box;}
+		*::-webkit-scrollbar{display:none;width:0px;height:0px;}*::-webkit-scrollbar-corner {display:none;width:0px;height:0px; }*::-webkit-resizer{display:none;}
+		
+		.weui-icon-success-no-circle {
+			display:inline-block;
+			margin-bottom: 5px;
+			-webkit-mask-repeat: no-repeat;
+			mask-repeat: no-repeat;
+			-webkit-mask-size: 100%;
+			mask-size: 100%;
+			background-color: currentColor;
+			color: #07c160;
+			width: 50px;
+			height: 50px;
+			mask-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8.657%2018.435L3%2012.778l1.414-1.414%204.95%204.95L20.678%205l1.414%201.414-12.02%2012.021a1%201%200%2001-1.415%200z%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E);
+			-webkit-mask-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8.657%2018.435L3%2012.778l1.414-1.414%204.95%204.95L20.678%205l1.414%201.414-12.02%2012.021a1%201%200%2001-1.415%200z%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E);
+		}
+	</style>
+	<script>
+		function getProtocol(){
+			return window.location.protocol.indexOf('https')>-1?'https:':'http:';
+		}
+		String.prototype.replaceAll = function(s1,s2){ 
+			return this.replace(new RegExp(s1, "gm"), s2);
+		}
+
+		function extractHttpLink(text) {
+			// 正则表达式匹配http和https链接
+			const httpUrlRegex = /(\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+			// 使用match方法提取所有匹配项
+			const found = text.match(httpUrlRegex);
+			return found?found[0]:text;
+		};
+		// 判断mobile、 pc
+		function detectDeviceType() {
+			  // 检查是否存在触摸事件支持
+			  const hasTouchScreen = (
+				'ontouchstart' in window ||
+				navigator.maxTouchPoints > 0 ||
+				navigator.msMaxTouchPoints > 0
+			  );
+			  console.log("hasTouchScreen: ", hasTouchScreen);
+			  // 检查用户代理字符串中是否包含常见的移动设备关键词
+			  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+			// 检查屏幕宽度（可选，因为有些平板设备可能有较大的屏幕）
+			// const isSmallScreen = window.innerWidth <= 768;
+
+			//console.log("isMobile: ", isMobile);
+			//console.log("isSmallScreen: ", isSmallScreen);
+			if (hasTouchScreen && (isMobile)) {
+				return 'mobile';
+			} else {
+				return 'pc';
+			}
+		}
+
+		function renderDom(tpl_id,data){
+			var itemDiv = document.createElement('div');
+			var html = document.getElementById(tpl_id).innerHTML;
+			var keys = Object.keys(data);
+			for(var j=0;j<keys.length;j++){
+				var key = keys[j];
+				html = html.replaceAll('{'+key+'}',data[key]);
+			}
+			itemDiv.innerHTML = html;
+			itemDiv = itemDiv.children[0];
+			return itemDiv;
+		}
+		
+		async function getImageInfo(imageUrl) {
+			const img = new Image();
+			return new Promise((resolve, reject) => {
+				img.onload = async () => {
+					const width = img.width;
+					const height = img.height;
+					try {
+						// 使用 fetch 获取图像的响应
+						const response = await fetch(imageUrl);
+						const blob = await response.blob();
+						const fileSize = parseInt(blob.size / 1024); // 文件大小以 KB 为单位
+
+						// 返回图像信息
+						resolve({width, height, fileSize});
+					} catch (error) {
+						resolve(null);
+					}
+				};
+				// 设置图像加载失败的回调
+				img.onerror = () => {
+					resolve(null);
+				};
+				// 设置图像的源
+				img.src = imageUrl;
+			});
+		}
+		
+		
+		function http_get(req){var xhr=new XMLHttpRequest();xhr.ontimeout=function(e){xhr.abort()};xhr.onerror=function(e){};xhr.open("GET",req.url,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){req.callback(xhr.responseText)}};xhr.timeout=10*1000;xhr.send()}
+		function http_post(req){var xhr=new XMLHttpRequest();xhr.ontimeout=function(e){xhr.abort()};xhr.onerror=function(e){};xhr.open("POST",req.url,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){req.callback(xhr.responseText)}};xhr.timeout=10*1000;xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");var post_data=[];var postData=req.data;postData=(function(value){for(var key in value){if(typeof(value[key])=='object'){post_data.push(key+"="+encodeURIComponent(JSON.stringify(value[key])))}else{post_data.push(key+"="+encodeURIComponent(value[key]))}};return post_data.join('&')}(postData));xhr.send(postData)}
+		function getParamsFromUrl(a){try {var query = window.location.search.substring(1);var vars = query.split("&");for(var i=0;i<vars.length;i++) {var pair = vars[i].split("=");if(pair[0] == a){return pair[1];}}}catch(e){}return(false);};
+		function popToast(obj){
+			closeToast();
+			var popDiv = document.createElement('div');
+			popDiv.id = 'popToast';
+			popDiv.className ="popToast";
+			var html = '';
+			obj.icon = obj.icon?obj.icon:'none';
+			var icon_url = 'https://zqmodule.oss-cn-hangzhou.aliyuncs.com/www/loading.gif';
+			
+			if(obj.icon&&obj.icon=='error') {
+				icon_url = 'https://zqmodule.oss-cn-hangzhou.aliyuncs.com/www/error.png';
+			}
+			
+			if(obj.icon&&obj.icon=='none') {
+			} else {
+				html += '<img class="pop-icon" src="'+icon_url+'" style="width:30px;"/>';
+			}
+			
+			var content = obj.title || obj.text || obj.content;
+			
+			html += '<div class="popToast-title">'+obj.title+'</div>';
+			if(obj.icon&&obj.icon=='success') {
+				html = '<div class="pop-mask" style="position:fixed;top:0;bottom:0;right:0;width:100%;background-color:rgba(0,0,0,0.3);z-index:5349;"></div>';
+				html += '<div class="weui-toast"><i class="weui-icon-success-no-circle weui-icon_toast"></i><p class="weui-toast__content">'+content+'</p></div>';
+			}
+			if(obj.icon&&obj.icon=='loading') {
+				html = '<div class="pop-mask" style="position:fixed;top:0;bottom:0;right:0;width:100%;background-color:rgba(0,0,0,0.3);z-index:5349;"></div>';
+				html += '<div class="weui-toast"><span class="weui-primary-loading weui-icon_toast"> <span class="weui-primary-loading__dot"></span></span> <p class="weui-toast__content">'+content+'</p></div>';
+			}
+			if(obj.icon&&obj.icon=='none') {
+				html = '<div class="pop-mask" style="position:fixed;top:0;bottom:0;right:0;width:100%;background-color:rgba(0,0,0,0.3);z-index:5349;"></div>';
+				html += '<div class="weui-toast weui-toast_text"> <p class="weui-toast__content">'+content+'</p> </div>';
+			}
+			
+			html += '<style>.weui-toast{position:fixed;z-index:5500;font-size:10px;width:13.6em;height:13.6em;top:40%;left:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);text-align:center;border-radius:12px;color:rgba(255,255,255,0.9);display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;background-color:#4c4c4c;box-sizing:border-box;line-height:1.4}';
+			html += '.weui-icon_toast{display:block;margin-bottom:16px}';
+			html += '.weui-primary-loading{font-size:16px;display:-webkit-inline-box;display:-webkit-inline-flex;display:inline-flex;position:relative;width:1em;height:1em;vertical-align:middle;color:#606060;-webkit-animation:circleLoading 1s steps(60,end) infinite;animation:circleLoading 1s steps(60,end) infinite}';
+			html += '.weui-icon_toast.weui-primary-loading{display:-webkit-box;display:-webkit-flex;display:flex;width:1em;height:1em;font-size:40px;color:#ededed}';
+			html += '.weui-primary-loading::before,.weui-primary-loading::after{content:"";display:block;width:0.5em;height:1em;box-sizing:border-box;border:0.0875em solid;border-color:currentColor}';
+			html += '.weui-primary-loading::before{border-right-width:0;border-top-left-radius:1em;border-bottom-left-radius:1em;-webkit-mask-image:-webkit-linear-gradient(top,#000000 8%,rgba(0,0,0,0.3) 95%)}';
+			html += '.weui-icon_toast.weui-primary-loading::before{border-width:4px 0 4px 4px}';
+			html += '.weui-primary-loading::after{border-left-width:0;border-top-right-radius:1em;border-bottom-right-radius:1em;-webkit-mask-image:-webkit-linear-gradient(top,rgba(0,0,0,0) 8%,rgba(0,0,0,0.3) 95%)}';
+			html += '.weui-icon_toast.weui-primary-loading::after{border-width:4px 4px 4px 0}';
+			html += '.weui-toast__content{font-size:17px;padding:0 12px;word-wrap:break-word;-webkit-hyphens:auto;hyphens:auto;font-family:system-ui,-apple-system,Helvetica Neue,sans-serif;margin:0;padding:0 12px}';
+			
+			html += '.weui-icon-success { mask-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M12%2022C6.477%2022%202%2017.523%202%2012S6.477%202%2012%202s10%204.477%2010%2010-4.477%2010-10%2010zm-1.177-7.86l-2.765-2.767L7%2012.431l3.119%203.121a1%201%200%20001.414%200l5.952-5.95-1.062-1.062-5.6%205.6z%22%2F%3E%3C%2Fsvg%3E);}';
+			html += '.weui-icon-success-circle { mask-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M12%2022C6.477%2022%202%2017.523%202%2012S6.477%202%2012%202s10%204.477%2010%2010-4.477%2010-10%2010zm0-1.2a8.8%208.8%200%20100-17.6%208.8%208.8%200%20000%2017.6zm-1.172-6.242l5.809-5.808.848.849-5.95%205.95a1%201%200%2001-1.414%200L7%2012.426l.849-.849%202.98%202.98z%22%2F%3E%3C%2Fsvg%3E);}';
+			html += '.weui-icon-success-no-circle {margin-bottom:10px;-webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;-webkit-mask-size: 100%;mask-size: 100%;background-color: currentColor;color:#07c160;width:50px; height:50px;mask-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8.657%2018.435L3%2012.778l1.414-1.414%204.95%204.95L20.678%205l1.414%201.414-12.02%2012.021a1%201%200%2001-1.415%200z%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E);-webkit-mask-image:url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8.657%2018.435L3%2012.778l1.414-1.414%204.95%204.95L20.678%205l1.414%201.414-12.02%2012.021a1%201%200%2001-1.415%200z%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E);}';
+			
+			html +=`.weui-icon-warn {
+				display: inline-block;
+				vertical-align: middle;
+				font-size: 10px;
+				width: 4em;
+				height: 4em;
+				color: rgba(255, 255, 255, 0.9);
+				-webkit-mask-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M12%2022C6.477%2022%202%2017.523%202%2012S6.477%202%2012%202s10%204.477%2010%2010-4.477%2010-10%2010zm-.763-15.864l.11%207.596h1.305l.11-7.596h-1.525zm.759%2010.967c.512%200%20.902-.383.902-.882%200-.5-.39-.882-.902-.882a.878.878%200%2000-.896.882c0%20.499.396.882.896.882z%22%2F%3E%3C%2Fsvg%3E);
+				mask-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M12%2022C6.477%2022%202%2017.523%202%2012S6.477%202%2012%202s10%204.477%2010%2010-4.477%2010-10%2010zm-.763-15.864l.11%207.596h1.305l.11-7.596h-1.525zm.759%2010.967c.512%200%20.902-.383.902-.882%200-.5-.39-.882-.902-.882a.878.878%200%2000-.896.882c0%20.499.396.882.896.882z%22%2F%3E%3C%2Fsvg%3E);
+			}
+			
+			.weui-toast_text {
+				width: auto;
+				height: auto;
+				min-width: 152px;
+				max-width: 216px;
+				padding: 12px 0;
+				border-radius: 8px;
+			}
+			`
+			
+			
+			html += '@keyframes circleLoading{0%{transform:rotate3d(0,0,1,0deg)}100%{transform:rotate3d(0,0,1,360deg)}}</style>';
+			popDiv.innerHTML = html;
+			document.body.appendChild(popDiv);
+			
+			if(obj.hasOwnProperty('timeout') && obj.timeout>0) {
+				setTimeout(function(){
+					var dom = document.getElementById('popToast');
+					if(dom) {
+						dom.parentNode.removeChild(dom);
+					}
+					if(obj.callback){obj.callback();}
+				},obj.timeout||2000);
+			}
+			
+			popDiv.closeSelf = function() {
+				popDiv.remove();
+			}
+			return popDiv;
+		}
+
+		function textToast(title){
+			var popDiv = document.getElementById('popToast');
+			if(popDiv){
+				var titleDiv = document.querySelector('.popToast-title');
+				titleDiv.innerHTML = title;
+			}
+		}
+		function closeToast(){
+			var dom = document.getElementById('popToast');
+			if(dom) {
+				dom.parentNode.removeChild(dom);
+			}
+		}
+	</script>
+</head>
+<body>
+<script id="tpl-preview-img" type="text/html">
+	<div style="width:100%;height:100%;display:flex;flex-direction: column;">
+		<button class="btn-close-preview" style="z-index:1;position:absolute; align-items: center;text-decoration:none;color:#fff; display:inline-block;padding:10px 10px 13px;background:none;border:none;font-size:16px;font-weight:normal;border-radius:15px;margin-right:20px;display: flex;flex-direction: row;"><svg t="1653894669054" class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" p-id="2381" width="32" height="32"><path d="M800 480H268.8l233.6-233.6c12.8-12.8 12.8-32 0-44.8-12.8-12.8-32-12.8-44.8 0l-284.8 288c-12.8 12.8-12.8 32 0 44.8h3.2l284.8 288c6.4 6.4 16 9.6 22.4 9.6 9.6 0 16-3.2 22.4-9.6 12.8-12.8 12.8-32 0-44.8L272 544H800c19.2 0 32-12.8 32-32s-16-32-32-32z" p-id="2382" fill="currentColor"></path></svg><span style="display:none;">返回</span></button>
+		<div class="video-box" style="height:calc(100%);">
+			<div style="width:100%;height: 100%;padding:20px 10px 10px;text-align: center;    display: flex;  align-items: center;justify-content:center;">
+				<div style="display:inline-block;text-align:center;">
+					<div style="font-size:18px;color:#fff;margin-bottom:12px;">长按图片3秒，转发图片给自己</div>
+					<img src="{data_out}"  style="display: inline-block; max-height: 80%;max-width: 80%;vertical-align: middle;border-radius:4px;" onclick="event.stopPropagation();"/>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script id="tpl-download-url" type="text/html">
+	<div style="display:flex; flex-direction:column;">
+		<button class="btn-close-preview" style="z-index:1;position:absolute; align-items: center;text-decoration:none;color:#fff; display:inline-block;padding:10px 10px 13px;background:none;border:none;font-size:16px;font-weight:normal;border-radius:15px;margin-right:20px;display: flex;flex-direction: row;"><svg t="1653894669054" class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" p-id="2381" width="32" height="32"><path d="M800 480H268.8l233.6-233.6c12.8-12.8 12.8-32 0-44.8-12.8-12.8-32-12.8-44.8 0l-284.8 288c-12.8 12.8-12.8 32 0 44.8h3.2l284.8 288c6.4 6.4 16 9.6 22.4 9.6 9.6 0 16-3.2 22.4-9.6 12.8-12.8 12.8-32 0-44.8L272 544H800c19.2 0 32-12.8 32-32s-16-32-32-32z" p-id="2382" fill="currentColor"></path></svg><span style="display:none;">返回</span></button>
+		<div style="height: 100vh; display:flex; flex-direction:column;align-items: center;justify-content: center">
+			<div style="font-size:18px;color:#07c160; margin:8px;text-align: center;">复制下面图片链接，到浏览器中粘贴下载</div>
+			<div class="url-container" onclick="copyToClipboard()" style="background-color: #FFFFFF; border-radius: 20px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; width: 90%; max-width: 800px; margin: 8px auto;">
+				<span class="url-text" style="color: #000000; font-size: 14px; white-space: nowrap; overflow: auto;">{data_out}</span>
+				<button class="copy-btn" style="background-color: #07c160; color: #f5f5f5; border: none; border-radius: 10px; padding: 8px 8px; cursor: pointer; font-size: 18px; margin-left: 15px; white-space:nowrap;">复制</button>
+			</div>
+		</div>
+	</div>
+</script>
+
+<div class="content-detail">
+	<div class="content-bd">
+		<div class="img-info">
+			 <div><img id="data_out" style="pointer-events: none; user-select: none;max-width:200px;max-height:500px;object-fit: contain;background: #f3f3f3;" src=""></div>
+			 <div id="wh1_px" style="text-align:center;font-size: 0.32rem;color: #999BA9;margin-top:6px;"></div>
+			 <div id="wh2_px" style="text-align:center;font-size: 0.32rem;color: #999BA9;margin-top:6px;"></div>
+			 <div id="tip_info" style="display:none;line-height: 1.5;text-align:left;font-size: 0.32rem;color: #FF0000;margin:6px 25px;background-color: #FFFFCC;;border: 2px solid #FF0000;padding:5px;"><b>【上传失败?】</b>请咨询人工客服，客服会帮您重新制作或退款</div>
+		</div>
+	</div>
+	<div class="kefu-info" style="text-align: center; font-size: 0.4rem; margin-bottom: 25px; color: #000000;">
+		<div>任何问题和需求，免费解决</div>
+		<div style="display:none;"><a id="kefu_url" style="color: #0000FF; font-style: italic; text-decoration: underline; cursor: pointer;" href="https://70.900.vc/csj_order_problem.html?id=175271795359347">&gt;&gt;点这里联系客服&lt;&lt;</a></div>
+	</div>
+	<div class="content-ft">
+		<div class="download-btn" onclick="download_img()">下载照片</div>
+	</div>
+	<style>
+		.content-detail{
+			background:#f6f7fb;
+			display:flex;
+			flex-direction: column;
+			height:100%;
+			width:100%;
+			
+		}
+		.content-bd{
+			width:100%;
+			flex:1;
+			background:#f6f7fb;
+			display:flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+		.content-bd  .img-info{
+			//display:inline-block;
+			display:flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		
+		.content-ft{
+			width:100%;
+			background:#fff;
+			border-top-left-radius: 14px;
+			border-top-right-radius: 14px;
+			height:78px;
+			overflow:hidden;
+		}
+		.content-ft .download-btn,.download-btn{
+			width: 96%;
+			height: 1.3rem;
+			display: -ms-flexbox;
+			display: flex;
+			-ms-flex-align: center;
+			align-items: center;
+			-ms-flex-pack: center;
+			justify-content: center;
+			border-radius: 0.66666667rem;
+			font-size: 0.42666667rem;
+			background-color: #7F6AFF;
+			color: #FFFFFF;
+			font-family: PingFangSC-Medium, PingFang SC;
+			font-weight: 500;
+			text-align: center;
+			margin: 10px auto 10px ;
+			cursor:pointer;
+		}
+	</style>
+</div>
+
+<script>
+	function fallbackCopyTextToClipboard(text) {
+		const textArea = document.createElement('textarea');
+		textArea.value = text;
+		document.body.appendChild(textArea);
+		textArea.select();
+		try {
+			document.execCommand('copy');
+			alert('复制成功: ' + text);
+		} catch (err) {
+			console.error('复制失败:', err);
+			alert('复制失败，请手动复制');
+		}
+		document.body.removeChild(textArea);
+	}
+	function copyToClipboard() {
+		const urlText = document.querySelector('.url-text').textContent;
+		fallbackCopyTextToClipboard(urlText);
+		
+		/*
+		navigator.clipboard.writeText(urlText).then(function() {
+			alert('复制成功！');
+		}, function() {
+			alert('复制失败，请重试。');
+		});
+		*/
+	}
+	// 获取跳转微信客服的链接
+	function get_wx_service_link(order_id){
+		var req_params = {
+			kfid: 'kfcaf30e8ba222ae963',  
+			scene: order_id
+		};
+		return new Promise((resolve, reject) => {
+			http_post({url:getProtocol()+'//129.400.lv/wxchat/wf',data:req_params,callback:function(result){
+				var service_link_url = extractHttpLink(result);
+				resolve(service_link_url);
+			}})
+		});
+	};
+	
+	function convertWeixinUrl(originalUrl) {  
+		const parsedUrl = new URL(originalUrl);
+		const kfid = parsedUrl.pathname.split('/')[2];
+		const encScene = parsedUrl.searchParams.get('enc_scene');
+		const newUrl = new URL('weixin://jumptokfchat/');
+		newUrl.searchParams.append('kfid', kfid);
+		newUrl.searchParams.append('scene', '50');
+		const extParams = new URLSearchParams();
+		extParams.append('enc_scene', encScene);
+		extParams.append('refkey', '');
+		newUrl.searchParams.append('ext_params', extParams.toString());
+		return newUrl.toString(); 
+	}
+	
+	function get_order_info(order_id){
+		return new Promise((resolve, reject) => {
+			http_post({url:getProtocol()+'//www.xiexinbao.com/csj_order/item?id='+order_id,callback:function(html){
+				try{
+					var _order = JSON.parse(html);
+					resolve(_order);
+				}catch(e){
+					resolve('http_error');
+				}
+			}});
+		});
+	}
+	async function render_order(order){
+		var src_url = order.data_out_temp;
+		if (order.pay_status==1 && order.data_out && order.data_out.indexOf('http')>-1) {
+			src_url = order.data_out;
+		};
+		document.querySelector("#data_out").setAttribute('src', src_url);
+		var data_in = JSON.parse(order.data_in);
+		var data_out_info = await getImageInfo(order.data_out||order.data_out_temp); 
+		if (data_in.item_id == 1) {
+			document.querySelector("#wh1_px").innerHTML=`压缩前大小：${data_in.ori_file_size}kb，压缩前尺寸：${data_in.ori_width_px}*${data_in.ori_height_px}px`;
+			document.querySelector("#wh2_px").innerHTML=`压缩后大小：${data_out_info.fileSize}kb，压缩后尺寸：${data_out_info.width}*${data_out_info.height}px`;
+		};
+	}
+	
+	var order_id = getParamsFromUrl('id') || getParamsFromUrl('order_id') || 'no_order_id';
+	
+	if (order_id != 'no_order_id') {
+		var kefu_url = document.getElementById("kefu_url").href;
+		document.getElementById("kefu_url").href = kefu_url + '?id=' + order_id;
+	};
+	
+	console.log(document.getElementById("kefu_url").href);
+	//var order_id = "172595235373747";
+	var order = {id:order_id,data_out:'',data_out_temp:'',pay_status:0};
+	async function checkOrderResult(){
+		order = await get_order_info(order_id);
+		if(order=='http_error') {
+			setTimeout(checkOrderResult,3*1000);
+			return ;
+		}
+		
+		if(order.pay_status==1) {//已付款
+			//制单成功，popPayOk(); 是不是0元，
+			if(order.data_out) {
+				if(order.data_out.indexOf('http')>-1){
+					render_order(order);
+					popDiv.closeSelf();
+					//popPayOk();
+					download_img();
+				} else {
+					popError();
+				}
+				popDiv.closeSelf();
+			} else {
+				setTimeout(checkOrderResult,3*1000);
+			}
+		}
+		if(order.pay_status==0) {//未付款
+			if(order.data_out_temp) {
+				if(order.data_out_temp.indexOf('http')>-1){
+					render_order(order);
+					popDiv.closeSelf();
+					popToast({title:'制单成功',icon:'success',timeout:2000});
+				} else {
+					popError();
+				}
+			} else {
+				setTimeout(checkOrderResult,3*1000);
+			}
+		}
+	}
+	//①：等待水印图
+	//②：等待无水印图
+	//③：我的订单
+	var popDiv = popToast({title:"数据加载中...",icon:"loading"});;
+	async function main(){
+		order = await get_order_info(order_id);
+		var data_in = JSON.parse(order.data_in);
+		if (data_in.item_id == 1) {
+			if (data_in.do_id == 6000) {
+				document.querySelector('.download-btn').innerHTML='下载无水印压缩照片';
+			} else {
+				document.querySelector('.download-btn').innerHTML='下载压缩照片';
+			};
+		};
+		/*
+		if (data_in.do_id == 2) {
+			document.querySelector('.download-btn').innerHTML='下载照片';
+		};
+		*/
+		
+		popDiv.closeSelf();
+		if((order.pay_status==1 && order.data_out && order.data_out.indexOf('http')>-1) || (order.data_out_temp&&order.data_out_temp.indexOf('http')>-1)){
+			//渲染图片
+			render_order(order);
+			if (order.pay_status==1 && order.data_out && order.data_out.indexOf('http')>-1) {
+				download_img();
+			};
+		}
+		if(order.data_out_temp&&order.data_out_temp.indexOf('http')==-1){
+			popError();
+			return;
+		}
+		if(order.data_out && order.data_out.indexOf('http')==-1){
+			popError();
+			return
+		}
+		if(order.data_out_temp==''&&order.pay_status==0){//正在制作水印图
+			popDiv = popToast({title:"照片<br>制作中",icon:"loading"});
+			//定时查询订单数据
+			setTimeout(checkOrderResult,3000);
+		}
+		
+		if(order.data_out=='' && order.pay_status==1){//正在制作无水印图
+			popDiv = popToast({title:"下载照片中",icon:"loading"});
+			//定时查询订单数据
+			setTimeout(checkOrderResult,3000);
+		}
+	}
+	setTimeout(main,200);
+	function popPayOrder(order){
+		window.clickPay = function(pay_url){
+			//popClose();
+			var payType ='去微信付款';
+			if(pay_url.indexOf('alipay')>-1) {
+				payType ='去支付宝付款';
+			}
+			//cswtj.log({a:'clickPay',d:payType});
+			//window.location.href = pay_url;
+			if(window.hasOwnProperty('cswtj')){
+				cswtj.log({a:'clickPhotoPay',w:order.item_id,d:''});
+			};
+			window.location.href = pay_url;
+		}
+		var pay_wxpay_url = `http://www.xiexinbao.com/csj_order/wxh5pay?order_id=${order.id}`;
+		var pay_alipay_url = `http://www.xiexinbao.com/csj_order/alipay?order_id=${order.id}`;
+
+		var pay_tips = `<p style="font-size:16px;">支付${order.price}元，即可下载照片！<br></p>
+			<p style="line-height:26px;margin-bottom:13px;">
+				<label style="color:red;font-size:12px;">【付款后，别忘了回来下载照片哦！】<br>【照片不能用，可联系客服免费调整】</label>
+			</p>`;
+
+		var pay_content ='';
+		pay_content += `<div class="pay-btns">
+			<a onclick="clickPay('${pay_wxpay_url}')"> <img style="width:90%;" src="https://down.xiexinbao.com/file1123/1696216565251.png"></a>
+			<a onclick="clickPay('${pay_alipay_url}')" ><img style="width:90%;margin-bottom:15px;margin-top:25px;" src="https://down.xiexinbao.com/file1123/1696216553316.png"></a>
+		</div>`;
+		popHtml({
+			title:'付费保存照片',align:'center',
+			content:'<div style="text-align:center;margin:5px 0 5px;">'+pay_tips+pay_content+'</div>'
+		});
+	}
+	
+	function popPayOk(){
+		pay_content = `<div style="text-align:center;margin:5px 0 5px;">
+			<i class="weui-icon-success-no-circle weui-icon_toast" style="display:inline-block;"></i>
+			<p style="color: #07c160;font-size:0.52666667rem;font-weight: 500;margin-bottom:36px;">照片下载完成</p>
+			<div class="download-btn" onclick="_download_img()">保存照片</div>
+		</div>`;
+		var popDiv = popHtml({title:' ',align:'center',content:pay_content});
+		window._download_img = function(){
+			popDiv.closeSelf();
+			download_img();
+		}
+	}
+	function redo(){
+		window.location.href ='/';
+	}
+	function popError(){
+		document.querySelector('.download-btn').innerHTML='重新上传照片';
+		document.querySelector('.download-btn').setAttribute('onclick','redo()')
+		popToast({title:order.data_out||order.data_out_temp,timeout:3500});
+	}
+	function setOrderPayStatus(){
+		return new Promise(function(resolve,reject){
+			http_post({url:getProtocol()+'//www.xiexinbao.com/csj_order/pay_status',data:{id:order.id},callback:function(result){
+				resolve();
+			}})
+		});
+	}
+	
+	function add_wx_file(reqParams){
+		return new Promise((resolve, reject) => {
+			http_post({url:getProtocol()+'//p.xiexinbao.com/csj_wxkefu_file/add_or_set',data:reqParams,callback:function(result){
+				resultObject = JSON.parse(result); 
+				resolve(resultObject.status);
+			}})
+		});
+	};
+	async function getFileSize(fileUrl) {
+		return new Promise((resolve, reject) => {
+			fetch(fileUrl, { method: 'HEAD' })
+				.then(response => {
+					if (!response.ok) {
+						resolve(null);
+					}
+					resolve(response.headers.get('content-length'));
+				})
+				.catch(error => resolve(null));
+		});
+	}
+	function isFromWeiXin(){
+		var ua = navigator.userAgent.toLowerCase();  
+		return ua.indexOf('micromessenger') != -1; 
+	}
+	async function wxkf_download(){
+		var file_name = order.data_out.split('/').pop();
+		var file_type = file_name.split('.').pop();
+		var file_size = await getFileSize(order.data_out); 
+		var add_wx_params = {
+			'id': order.id,
+			'file_url': order.data_out,
+			'file_size': file_size,
+			'file_type': file_type,
+			'uid': order.user_id,
+			'file_name': file_name,
+		};
+		var order_status = await add_wx_file(add_wx_params);
+		
+		var wxkf_down_link = `https://work.weixin.qq.com/kfid/kfcfa19e0f56abeed54?enc_scene=ENC8B8HpfCTPuj6zZSv1fbgyXnTk4tVCdZxbjG9wFASvGzt&scene_param=${order.id}`;
+		window.location.href = wxkf_down_link;
+	}
+
+	async function download_img(){
+		window.location.href = `http://70.900.vc/d_browser2.html?id=${order.id}`
+		return;
+		var jump_kefu = 0;
+		var data_in = JSON.parse(order.data_in);
+		if (data_in.admin_uid != 'demo' && data_in.jump_kefu==1) {
+			jump_kefu = 1;
+			window.location.href = `csj_order_problem.html?id=${order.id}`
+		}
+		//弹出提示去下载
+		if((order.pay_status==1 || data_in.admin_uid == 'demo') && order.data_out.indexOf('http')>-1) {
+			// isFromWeiXin() && data_in.admin_uid != 'demo' && order.ua && order.ua.indexOf("iphone") == -1
+			if (isFromWeiXin() && data_in.admin_uid != 'demo' && order.ua && order.ua.indexOf("iphone") == -1) {
+				wxkf_download();
+			} else {
+				window.location.href = `${getProtocol()}//${order.track}/d_browser2.html?id=${order.id}`;
+			}
+			return;
+		
+			window.location.href = `${getProtocol()}//${order.track}/d_browser2.html?id=${order.id}`;
+			return;
+			if (order.item_id == 1) {
+				window.location.href = `${getProtocol()}//${order.track}/d_browser1.html?id=${order.id}`;
+				return;
+			};
+			if (order.item_id == 6013) {
+				window.location.href = `${getProtocol()}//${order.track}/d_browser2.html?id=${order.id}`;
+				return;
+			};
+			if (data_in.admin_uid == 'demo') {
+				window.location.href = `${getProtocol()}//${order.track}/d_browser2.html?id=${order.id}`;
+				return;
+			};
+			var divPreview = renderDom('tpl-preview-img',{data_out:order.data_out});
+			if ((order.ua && order.ua.indexOf("iphone")>-1 && data_in.item_id == 1) || data_in.do_id == 2) {
+				divPreview = renderDom('tpl-download-url',{data_out:order.data_out});
+			};			
+			var div_page = popPage({id:"popPreview",content:divPreview});
+			div_page.querySelector('.btn-close-preview').onclick = (function(div_page){
+				return function(){
+					div_page.closeSelf();
+				}
+			})(div_page);
+			return;
+		}
+		//生成失败，联系客服
+		if(order.data_out!=''&&order.data_out.indexOf('http')==-1) {
+			popError();
+			return;
+		}
+		
+		//如果0元:弹窗：确认生成无水印图片？确定生成-->设置pay_status==1，重新加载当前页面
+		if(order.data_out==''&&order.price==0&&order.pay_status==0 && jump_kefu == 0) {
+			await setOrderPayStatus();
+			window.location.reload();
+			return;
+		}
+		//付款后，可下载无水印
+		if(order.pay_status==0 && order.price >0 && jump_kefu == 0) {
+			if(window.hasOwnProperty('cswtj')){
+				cswtj.log({a:'clickPhotoDown',w:order.item_id,d:''});  
+			}; 
+			popPayOrder(order);
+			return;
+		}
+	}
+</script>
+<script>
+(function() {
+	var cswtj_id = '';
+	var _plat = window.location.hostname;
+	var _w = window.hasOwnProperty('w')? window.hasOwnProperty('w'): '';
+	if (typeof localStorage == "object") {cswtj_id = localStorage.getItem('cswtj_id') || ''; }
+	function _loadtj(retries) {
+		var hm = document.createElement("script");
+		hm.src = getProtocol()+"//log.xiexinbao.com/cswtj.js?plat="+_plat+"&w="+_w+"&cswtj_id="+cswtj_id;
+		hm.onload = function() {};
+		hm.onerror = function() {if (retries > 0) {_loadtj(retries - 1);}console.log('cswtj.js load error!')};
+		var s = document.getElementsByTagName("script")[0]; 
+		s.parentNode.insertBefore(hm, s);
+	}
+	_loadtj(1);
+})();
+</script>
+
+</body></html>

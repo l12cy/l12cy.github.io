@@ -1,0 +1,2584 @@
+<html style="font-size: 44.8px;"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<title>证件照制作</title>
+	<meta name="description" content="">
+	<style>
+		* {padding: 0;margin: 0;box-sizing: border-box;}
+		*::-webkit-scrollbar{display:none;width:0px;height:0px;}*::-webkit-scrollbar-corner {display:none;width:0px;height:0px; }*::-webkit-resizer{display:none;}
+	</style>
+	<script src="img/cswtj.htm"></script><script>
+		function sleep(ms) {
+		  return new Promise(resolve => setTimeout(resolve, ms));
+		}
+		function getId(){
+			var id=(new Date).getTime()+'';
+			var str="";
+			var arr=['0','1','2','3','4','5','6','7','8','9'];
+			for(var i=0;i<2;i++){
+				var pos=Math.round(Math.random()*(arr.length-1));
+				str+=arr[pos]
+			}
+			return(new Date).getTime()+str
+		}
+		function getOS(){var i=(navigator.userAgent||navigator.vendor||window.opera).toLowerCase();return/windows/i.test(i)?"win":/iphone/i.test(i)&&!window.MSStream?"iphone":/ipad/i.test(i)&&!window.MSStream?"ipad":/ipod/i.test(i)&&!window.MSStream?"ipod":/macintosh|mac os x/i.test(i)?"mac":/android/i.test(i)?"android":/linux/i.test(i)?"linux":"unknown"}
+		function getBrowser(){var e=(navigator.userAgent||navigator.vendor||window.opera).toLowerCase(),r=[{name:"wx",regex:/micromessenger/i},{name:"edge",regex:/edg\/|edge\/|edga\//i},{name:"qq",regex:/qqbrowser/i},{name:"huawei",regex:/huaweibrowser/i},{name:"honor",regex:/hmbrowser|bdhonorbrowser/i},{name:"xiaomi",regex:/xiaomi|mi/i},{name:"uc",regex:/ucbrowser/i},{name:"samsung",regex:/samsungbrowser/i},{name:"intel",regex:/trident/i},{name:"opera",regex:/opr|opera/i},{name:"chromium",regex:/chromium/i},{name:"firefox",regex:/firefox/i},{name:"quark",regex:/quark/i},{name:"oppo",regex:/heytapbrowser|oppobrowser/i},{name:"vivo",regex:/vivoBrowser/i},{name:"chromium",regex:/chromium/i},{name:"chrome",regex:/chrome/i},{name:"safari",regex:/safari/i}].find(r=>r.regex.test(e));return console.log("detectedBrowser: ",r),r?r.name:"unknown"}
+		function getParamsFromUrl(a){var query = window.location.search.substring(1);var vars = query.split("&");for(var i=0;i<vars.length;i++) {var pair = vars[i].split("=");if(pair[0] == a){return pair[1];}}return(false);};
+		function http_get(req){var xhr=new XMLHttpRequest();xhr.ontimeout=function(e){xhr.abort()};xhr.onerror=function(e){};xhr.open("GET",req.url,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){req.callback(xhr.responseText)}};xhr.timeout=10*1000;xhr.send()}
+		function http_post(req){var xhr=new XMLHttpRequest();xhr.ontimeout=function(e){xhr.abort()};xhr.onerror=function(e){};xhr.open("POST",req.url,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){req.callback(xhr.responseText)}};xhr.timeout=10*1000;xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");var post_data=[];var postData=req.data;postData=(function(value){for(var key in value){if(typeof(value[key])=='object'){post_data.push(key+"="+encodeURIComponent(JSON.stringify(value[key])))}else{post_data.push(key+"="+encodeURIComponent(value[key]))}};return post_data.join('&')}(postData));xhr.send(postData)}
+		
+		function getCookie(cookieName) {
+			const strCookie = document.cookie;
+			const cookieList = strCookie.split(';');
+			for(let i = 0; i < cookieList.length; i++) {
+				const arr = cookieList[i].split('=');
+				if (cookieName === arr[0].trim()) {
+					return arr[1];
+				}
+			}
+			return '';
+		}
+		function setCookie(key,value){
+			return new Promise((resolve, reject) => {
+				if(window.location.protocol.indexOf('https')>-1 || window.location.protocol.indexOf('http')>-1) {
+					var cookie_img = new Image();
+					cookie_img.src = (window.location.protocol.indexOf('https')>-1?'https:':'http:')+'//'+window.location.hostname+'/set/cookie.gif?'+key+'='+value;
+					cookie_img.onload=function(){resolve();};  
+					cookie_img.onerror=function(){resolve();};  
+				}
+			});
+		}
+		
+		/* 获取当前日期 格式如 "20240912" */
+		function getCurrentDate() {
+			const now = new Date();
+
+			const year = now.getFullYear();
+			const month = String(now.getMonth() + 1).padStart(2, '0');
+			const day = String(now.getDate()).padStart(2, '0');
+			
+			return `${year}${month}${day}`;
+		}
+		
+		function isFromWeiXin(){
+			var ua = navigator.userAgent.toLowerCase();  
+			return ua.indexOf('micromessenger') != -1; 
+		}
+		 
+		function kefuTicket(_url){
+			var http={post:function(url,data,callback){var xhr=new XMLHttpRequest();xhr.open("POST",url,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){callback(xhr.responseText)}};if(typeof data=="object"){var arr=new Array();var i=0;for(var attr in data){arr[i]=encodeURIComponent(attr)+"="+encodeURIComponent(data[attr]);i++}data=arr.join("&");xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded")}else{if(data.indexOf("{")>-1&&data.indexOf("{")<2){xhr.setRequestHeader("Content-Type","application/json")}else{xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded")}}xhr.send(data)}};  
+			return new Promise((resolve, reject) => {
+				http.post(getProtocol()+'//www.xiexinbao.com/txb/wxticket',{kfurl:_url},function(_kefu_url){  
+					 if(_kefu_url.indexOf('weixin:')!=-1) {
+						resolve(_kefu_url);
+					 }  else {
+						resolve(_url);
+					 }
+				});
+			});
+		}
+		
+		function convertWeixinUrl(originalUrl) {  
+			const parsedUrl = new URL(originalUrl);
+			const kfid = parsedUrl.pathname.split('/')[2];
+			const encScene = parsedUrl.searchParams.get('enc_scene');
+			const newUrl = new URL('weixin://jumptokfchat/');
+			newUrl.searchParams.append('kfid', kfid);
+			newUrl.searchParams.append('scene', '50');
+			const extParams = new URLSearchParams();
+			extParams.append('enc_scene', encScene);
+			extParams.append('refkey', '');
+			newUrl.searchParams.append('ext_params', extParams.toString());
+			return newUrl.toString(); 
+		}
+		
+		// 判断是pc
+		function detectDeviceType() {
+		  // 检查是否存在触摸事件支持
+		  const hasTouchScreen = (
+			'ontouchstart' in window ||
+			navigator.maxTouchPoints > 0 ||
+			navigator.msMaxTouchPoints > 0
+		  );
+		  // 检查用户代理字符串中是否包含常见的移动设备关键词
+		  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		  if (hasTouchScreen && (isMobile)) {
+			return 'mobile';
+		  } else {
+			return 'pc';
+		  }
+		}
+		
+		
+		// 监视有data-url属性的img元素，只有进入视野才会加载
+		function setupLazyLoad() {
+			const observer = new IntersectionObserver((entries, observer) => {
+				entries.forEach(entry => {
+					const img = entry.target;
+					const delay = parseInt(img.dataset.delay, 10) || 200;
+					if (entry.isIntersecting) {
+						if (img._timeoutId) {
+							clearTimeout(img._timeoutId);
+						}
+						img._timeoutId = setTimeout(() => {
+							if (img.dataset.url) {
+								img.src = img.dataset.url;
+								img.removeAttribute('data-url');
+							}
+							observer.unobserve(img);
+						},delay);
+					} else {
+						if (img._timeoutId) {
+							clearTimeout(img._timeoutId);
+							img._timeoutId = null;
+						}
+					}
+				});
+			});
+			document.querySelectorAll('img[data-url]').forEach(img => {
+				observer.observe(img);
+			});
+		}
+		
+		// 通过模板渲染
+		function renderDomByTpl(tpl_id, data){
+			var itemDiv = document.createElement('div');
+			var html = document.getElementById(tpl_id).innerHTML;
+			var keys = Object.keys(data);
+			for(var j=0;j<keys.length;j++){
+				var key = keys[j];
+				html = html.replaceAll('{'+key+'}', data[key]);
+			}
+			itemDiv.innerHTML = html;
+			itemDiv = itemDiv.children[0];
+			return itemDiv;
+		}	
+		
+		function scrollToCenter(element) {
+			var container = element.parentNode;
+			var containerRect = container.getBoundingClientRect();
+			var elementRect = element.getBoundingClientRect();
+			var offsetX = elementRect.left - containerRect.left - (containerRect.width / 2) + (elementRect.width / 2);
+			container.scrollTo({left: container.scrollLeft + offsetX,behavior: 'smooth'});
+        }
+		
+		function getProtocol(){
+			return window.location.protocol.indexOf('https')>-1?'https:':'http:';
+		}
+		String.prototype.replaceAll = function(s1,s2){ 
+			return this.replace(new RegExp(s1, "gm"), s2);
+		}
+
+		function getUserId(){
+			return getCookie('openid') || localStorage.getItem('openid') || localStorage.getItem('cswtj_id') || getCookie('cswtj_id')||'';
+		}
+		
+		
+		var dpi_values = [72, 96, 150, 300, 350, 500];
+		var data_logo_map = {
+			logo1: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg",
+			logo2: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo2.jpg",
+			logo3: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo3.jpg",
+			logo4: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo4.jpg",
+			logo5: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo5.jpg",
+			logo6: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo6.jpg",
+			logo7: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo7.jpg",
+			logo8: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo8.jpg",
+			logo9: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo9.jpg",
+			logo10: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo10.jpg",
+			logo11: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo11.png",
+			logo12: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo12.jpg",
+			logo13: "http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo13.jpg",
+		};
+		// 宽、高、dpi、背景色、kb、审核
+		var md_map = {'cpta': '295,413,300,white,30,cpta', 'o1_cpta': '295,413,300,white,30,o1_cpta', 'pta_anhui': '295,413,300,white,30,pta_anhui', 'pta_shenzhen': '295,413,300,white,30,pta_shenzhen', 'qg_cpta': '480,640,300,white,45,qg_cpta', 'jdwz': '413,579,300,white,45,jdwz', 'gwyz': '295,413,300,white,30,gwyz', 'qizhi': '480,640,300,blue,45,qizhi', 'zhuom': '480,640,300,blue,45,zhuom', 'zhitao': '413,579,300,white,45,zhitao', 'zhitao2': '480,640,300,blue,50,zhitao2', 'nomax': '413,579,300,white,45,nomax', 'pta_sc': '295,413,300,white,30,pta_sc', 'pta_sc2': '295,413,300,white,30,pta_sc2', 'sdzk': '480,680,300,white,50,sdzk', 'md1': '413,626,300,blue,100,', 'md2': '413,579,300,white,25,', 'md3': '413,531,300,white,15,', 'md4': '400,531,300,white,60,', 'md5': '480,640,300,blue,60,', 'md6': '413,531,300,blue,35,'
+		, 'md7': '150,200,300,white,25,', 'md8': '145,200,300,white,15,', 'md9': '130,170,300,white,15,', 'md10': '295,413,300,white,25,', 'md11': '130,160,350,white,15,', 'md12': '130,160,300,blue,15,', 'md13': '480,640,300,white,30,', 'md14': '300,400,300,white,30,', 'md15': '480,640,300,light_blue,60,', 'md16': '413,531,300,white,35,', 'md17': '390,567,300,white,35,', 'md18': '295,413,300,white,15,','md19': '480,640,300,blue,35,', 'md20': '130,170,300,blue,15,', 'md21': '150,200,300,blue,15,'};
+		// 二建
+		var jzs_md = '安徽,pta_anhui;北京,md5;福建,cpta;广东,cpta;广西,cpta;重庆,cpta;贵州,o1_cpta;甘肃,nomax;河北,cpta;吉林,cpta;黑龙江,cpta;江苏,nomax;江西,cpta;河南,qizhi;湖北,cpta;湖南,cpta;海南,nomax;山西,o1_cpta;内蒙古,qg_cpta;辽宁,cpta;上海,o1_cpta;山东,o1_cpta;陕西,md1;四川,pta_sc;青海,nomax;宁夏,nomax;天津,nomax;浙江,cpta;云南,cpta;西藏,zhitao2;新疆,nomax';
+		// 省考
+		var gwy_md = '安徽,pta_anhui;北京,md5;福建,gwyz;广东,md2;广西,qg_cpta;重庆,cpta;贵州,jdwz;甘肃,nomax;河北,cpta;吉林,md6;黑龙江,jdwz;江苏,md3;江西,cpta;河南,qizhi;湖北,jdwz;湖南,md13;海南,md4;辽宁,gwyz;内蒙古,zhitao;宁夏,qg_cpta;青海,nomax;山西,qizhi;上海,cpta;山东,jdwz;陕西,qizhi;四川,pta_sc2;西藏,qg_cpta;新疆,nomax;云南,qg_cpta;浙江,jdwz';
+		// 事业单位
+		var sy_md = '安徽,pta_anhui;北京,md5;福建,gwyz;广东,md2;广西,qg_cpta;重庆,cpta;贵州,qg_cpta;甘肃,nomax;河北,qg_cpta;吉林白城市市直,cpta;吉林,qg_cpta;黑龙江,jdwz;江苏,md3;江西,cpta;河南,qizhi;湖北,jdwz;湖南,md6;海南,qg_cpta;辽宁,qg_cpta;内蒙古,zhitao;宁夏,qg_cpta;青海,nomax;山西,qg_cpta;上海,md7;山东寿光市,qizhi;山东,jdwz;陕西,qizhi;四川,pta_sc2;天津,nomax;西藏,qg_cpta;新疆,nomax;云南,qg_cpta;浙江,jdwz;石家庄市,o1_cpta'; 
+		// 选调生
+		var xds_md = '安徽,pta_anhui;北京,md5;福建,md8;广东,md2;广西,md9;重庆,md10;贵州,md10;甘肃,nomax;河北,md10;吉林,md6;黑龙江,md11;江苏,md3;江西,cpta;河南,md12;湖北,jdwz;湖南,md6;海南,md6;辽宁,md3;内蒙古,md6;宁夏,qg_cpta;青海,nomax;山西,qizhi;上海,md7;山东,jdwz;陕西,qizhi;四川,pta_sc;西藏,qg_cpta;新疆,nomax;云南,qg_cpta;浙江,jdwz';
+		// 三支一扶
+		var szyf_md = '安徽,pta_anhui;北京,md15;福建,gwyz;广东,md2;广西,qg_cpta;重庆,cpta;贵州,jdwz;甘肃,nomax;河北,md18;吉林,qg_cpta;黑龙江,md10;江苏,md3;江西,cpta;河南安阳市,zhuom;河南其他市,qizhi;湖北,jdwz;湖南,md6;海南,nomax;辽宁,md10;内蒙古,zhitao;宁夏,nomax;青海,nomax;山西,qizhi;上海,md7;山东,jdwz;陕西,qizhi;四川,pta_sc2;天津,nomax;西藏,qg_cpta;新疆,nomax;云南,qg_cpta;浙江,jdwz'; 
+		// 教师招聘
+		var jszp_md = '福建,gwyz;河北,md10;河南特岗,md13;湖北,md14;湖南益阳市,cpta;江苏淮安市,md20;江西,cpta;山东青岛市,jdwz;山东其他市,qizhi;青海,nomax;四川成都市,qg_cpta;广西南宁市,qg_cpta;河北石家庄市,o1_cpta;辽宁沈阳市,nomax';
+		// 西部计划
+		var xbjh_md = '甘肃,nomax;宁夏,nomax;其他省份,md6';
+		// 自学考试报名
+		var zxks_md = '山东,sdzk;浙江,md19;其他省,md13';
+		// 公安辅警招聘
+		var gafj_md = '甘肃,jdwz;广东深圳市,pta_shenzhen;黑龙江,qg_cpta;湖南,o1_cpta;江西,o1_cpta;内蒙古鄂尔多斯市,md21;内蒙古,zhitao;宁夏,o1_cpta;青海海北州,nomax;青海其他地区,cpta;西藏,o1_cpta';
+		// 港澳台和各国签证
+		var qz_md = '港澳通行证(无回执),md17;入台证(无回执),md16';
+		var data_info_map = {
+			'照片压缩': {name: '照片压缩', item_id:1, do_id:1, desc: "", logo: data_logo_map.logo4, pop_content_tpl:'pop-content-tpl-5', order_result_id: 2, jump_kefu: 0, price:4.9},
+			'换底色': {name: '换底色', item_id:6000, do_id:6000, desc: "", logo: data_logo_map.logo3, dpi:300, beauty:0, pop_content_tpl:'pop-content-tpl-2', jump_kefu: 0, price:4.9},
+			'自定义': {name: '自定义', item_id:6001, do_id:6000, desc: "", logo: data_logo_map.logo8, dpi:300, file_size: 50, beauty:0,pop_content_tpl:'pop-content-tpl-0', jump_kefu: 0, price:5.9},
+			'一寸照': {name:'一寸照', item_id:6002, do_id:6000, width_px:295, height_px:413, dpi:300, beauty:0, pop_content_tpl: 'pop-content-tpl-1', file_size: 50, desc: "25×35mm 295×413px", logo: data_logo_map.logo1, jump_kefu: 0, price:5.9},
+			'二寸照': {name:'二寸照', item_id:6003, do_id:6000, width_px:413, height_px:579, dpi:300, beauty:0, pop_content_tpl: 'pop-content-tpl-1', file_size: 50, desc: "35×49mm 413×579px", logo: data_logo_map.logo1, jump_kefu: 0, price:5.9},
+			'换正装': {name: '换正装', item_id:-1, do_id:6000, desc: "", logo: data_logo_map.logo6,pop_content_tpl:'pop-content-tpl-0', jump_kefu: 1},
+			'变清晰': {name: '变清晰', item_id:-1, do_id:6000, desc: "", logo: data_logo_map.logo7,pop_content_tpl:'pop-content-tpl-0', jump_kefu: 1},
+			'尺寸裁剪': {name: '尺寸裁剪', item_id:-1, do_id:6000, desc: "", logo: data_logo_map.logo2,pop_content_tpl:'pop-content-tpl-0', jump_kefu: 1},
+			'照片审核': {name: '照片审核', item_id:-1, do_id:6000, desc: "", logo: data_logo_map.logo10,pop_content_tpl:'pop-content-tpl-0', jump_kefu: 1},
+			'照片拼接': {name: '照片拼接', item_id:2, desc: "", logo: data_logo_map.logo13, n_page: 'item_2.html'},
+			'电子签名': {name: '电子签名', item_id:3, desc: "", n_page: 'item_3.html'},
+		
+			'自定义照片规格': {name: '自定义照片规格', item_id:6004, do_id:6000, desc: "", logo: data_logo_map.logo1, dpi:300, file_size: 50, beauty:0,pop_content_tpl:'pop-content-tpl-0', desc: "修改尺寸、背景色、kb", jump_kefu: 0, price:5.9},
+			'小一寸': {name:'小一寸', item_id:6005, do_id:6000, width_px:260, height_px:378, dpi:300, beauty:0, pop_content_tpl: 'pop-content-tpl-1', file_size: 50, desc: "22×32mm 260×378px", logo: data_logo_map.logo1, jump_kefu: 0, price:5.9},
+			'大一寸': {name:'大一寸', item_id:6006, do_id:6000, width_px:390, height_px:567, dpi:300, beauty:0, pop_content_tpl: 'pop-content-tpl-1', file_size: 50, desc: "33×48mm 390×567px", logo: data_logo_map.logo1, jump_kefu: 0, price:5.9},
+			'小二寸': {name:'小二寸', item_id:6007, do_id:6000, width_px:413, height_px:531, dpi:300, beauty:0, pop_content_tpl: 'pop-content-tpl-1', file_size: 50, desc: "35×45mm 413×531px", logo: data_logo_map.logo1, jump_kefu: 0, price:5.9},
+			'大二寸': {name:'大二寸', item_id:6008, do_id:6000, width_px:413, height_px:626, dpi:300, beauty:0, pop_content_tpl: 'pop-content-tpl-1', file_size: 50, desc: "35×53mm 413×626px", logo: data_logo_map.logo1, jump_kefu: 0, price:5.9},
+			
+			'英语四六级': {name:'英语四六级', item_id:6009, do_id:6000, dpi:300, all_pixels: "144*192,150*200,150*210,168*224,240*320,240*360,390*567,一寸(295*413),600*800", pop_content_tpl: 'pop-content-tpl-7', file_size: 50, desc: "", jump_kefu: 0, price:5.9},
+			'入学证件照': {name:'入学证件照', item_id:6012, do_id:6000, dpi:300, all_pixels: "一寸(295*413),二寸(413*579),小二寸(413*531),480*640,384*512,125*175", pop_content_tpl: 'pop-content-tpl-7', file_size: 50, desc: "", jump_kefu: 0, price:5.9},
+			
+			'格式转换': {name: '格式转换', item_id:6013, do_id:2, desc: "", logo: data_logo_map.logo11,pop_content_tpl:'pop-content-tpl-6', jump_kefu: 0, order_result_id: 2, price:5.9},
+			'研究生报名考试': {name:'研究生报名考试', item_id:6014, do_id:6000, dpi:300, file_size: 50, all_pixels: "480*640,150*200,390*567,425*567,413*579,318*425,一寸(295*413)", pop_content_tpl: 'pop-content-tpl-7', desc: "", jump_kefu: 0, price:5.9},
+			'高考报名': {name:'高考报名', item_id:6015, do_id:6000, dpi:300, file_size: 50, all_pixels: "600*800,480*640,390*567,420*560,360*480,545*763,一寸(295*413)", pop_content_tpl: 'pop-content-tpl-7', desc: "", jump_kefu: 0, price:5.9},
+			'电子排版照': {name:'电子排版照', item_id:6016, do_id:3, dpi:300, paper_size:5, all_pixels: "一寸排版照(295*413px),二寸排版照(413*579px)", pop_content_tpl: 'pop-content-tpl-9', desc: "", logo: data_logo_map.logo12, jump_kefu: 0, order_result_id: 2, price:5.9},
+			'计算机等级考试': {name:'计算机等级考试', item_id:1506, do_id:6000, width_px:330, height_px:480, dpi:300, pop_content_tpl: 'pop-content-tpl-1', file_size: 50, desc: "", jump_kefu: 0, price:5.9},
+			
+			'中国人事考试网报名': {name:'中国人事考试网报名', item_id:1000, do_id:6000, review: 'cpta', dpi:300,  width_px:295, height_px:413, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'国家公务员(国考)': {name:'国家公务员(国考)', item_id:1001, do_id:6000, review: 'gwyz', dpi:300,  width_px:295, height_px:413, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'军队文职': {name:'军队文职', item_id:1002, do_id:6000, review: 'jdwz', dpi:300,  width_px:413, height_px:579, file_size: 50, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'中国卫生人才网': {name:'中国卫生人才网', item_id:1003, do_id:6000, review: 'chpt2', dpi:300,  width_px:480, height_px:640, file_size: 70, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'会计考试报名照': {name:'会计考试报名照', item_id:1004, do_id:6000, dpi:300, width_px:295, height_px:413, file_size: 50, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "", jump_kefu: 0, price:9.9},
+			'国家医学考试': {name:'国家医学考试', item_id:1005, do_id:6000, review: 'nme', dpi:300, width_px:295, height_px:413, file_size: 55, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			
+			'全国人事考试服务平台': {name:'全国人事考试服务平台', item_id:1036, do_id:6000, review: 'qg_cpta', dpi:300,  width_px:295, height_px:413, file_size: 45, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'二级建造师': {name:'二级建造师', item_id:1037, do_id:6000, all_md: jzs_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'公务员省考': {name:'公务员省考', item_id:1038, do_id:6000, all_md: gwy_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'事业单位': {name:'事业单位', item_id:1039, do_id:6000, all_md: sy_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'选调生': {name:'选调生', item_id:1040, do_id:6000, all_md: xds_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'自学考试报名照': {name:'自学考试报名照', item_id:1041, do_id:6000, all_md: zxks_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'三支一扶': {name:'三支一扶', item_id:1042, do_id:6000, all_md: szyf_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'黄委会': {name:'黄委会', item_id:1043, do_id:6000, review: 'qizhi', dpi:300,  width_px:295, height_px:413, file_size: 45, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'社工报名照': {name:'社工报名照', item_id:1044, do_id:6000, review: 'cpta', dpi:300,  width_px:295, height_px:413, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'中医经典能力考试': {name:'中医经典能力考试', item_id:1045, do_id:6000, review: 'o1_cpta', dpi:300,  width_px:295, height_px:413, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'各省市教师招聘': {name:'各省市教师招聘', item_id:1046, do_id:6000, all_md: jszp_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'西藏职称政治考试': {name:'西藏职称政治考试', item_id:1047, do_id:6000, review: 'o1_cpta', dpi:300,  width_px:295, height_px:413, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'CATTI全国翻译专业': {name:'CATTI全国翻译专业', item_id:1048, do_id:6000, review: 'cpta', dpi:300,  width_px:295, height_px:413, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'深圳人事考评报名系统': {name:'深圳人事考评报名系统', item_id:1049, do_id:6000, review: 'pta_shenzhen', dpi:300,  width_px:295, height_px:413, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			//'甘肃宁夏西部计划': {name:'甘肃宁夏西部计划', item_id:1050, do_id:6000, all_md: xbjh_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'大学生西部计划': {name:'大学生西部计划', item_id:1050, do_id:6000, all_md: xbjh_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+			'公安辅警招聘': {name:'公安辅警招聘', item_id:1051, do_id:6000, all_md: gafj_md, pop_content_tpl: 'pop-content-tpl-11', desc: "已审核，直接上传", jump_kefu: 0, price:9.9},
+
+			'身份证电子照(无回执)': {name:'身份证电子照(无回执)', item_id:1500, do_id:6000, dpi:350, width_px:358, height_px:441, file_size: 25, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "26×32mm 358×441px", jump_kefu: 0, price:9.9},
+			'交管12123驾驶证': {name:'交管12123驾驶证', item_id:1501, do_id:6000, dpi:300,  width_px:520, height_px:756, file_size: 50, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "44×64mm 520×756px", jump_kefu: 0, price:9.9},
+			'健康证免冠个人照': {name:'健康证免冠个人照', item_id:1502, do_id:6000, dpi:350, width_px:358, height_px:441, file_size: 20, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "26×32mm 358×441px", jump_kefu: 0, price:9.9},
+			'社保卡证件照(无回执)': {name:'社保卡证件照(无回执)', item_id:1503, do_id:6000, dpi:350,  width_px:358, height_px:441, file_size: 45, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "26×32mm 358×441px", jump_kefu: 0, price:9.9},
+			'普通话水平测试': {name:'普通话水平测试', item_id:1504, do_id:6000, dpi:300,  width_px:390, height_px:567, file_size: 60, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "33×48mm 390×567px", jump_kefu: 0, price:5.9},
+			'专升本': {name:'专升本', item_id:1505, do_id:6000, dpi:300,  width_px:480, height_px:640, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "41×54mm 480×640px", jump_kefu: 0, price:5.9},
+			'教师资格证': {name:'教师资格证', item_id:1507, do_id:6000, dpi:300,  width_px:480, height_px:640, file_size: 60, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "", jump_kefu: 0, price:9.9},
+			'全国执业兽医': {name:'全国执业兽医', item_id:1514, do_id:6000, dpi:300,  width_px:230, height_px:334, file_size: 30, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "", jump_kefu: 0, price:5.9},
+			'中考报名': {name:'中考报名', item_id:1517, do_id:6000, dpi:300, file_size: 40, all_pixels: "480×640,390×567,300×400,240×320,一寸(295×413)", pop_content_tpl: 'pop-content-tpl-7', desc: "", jump_kefu: 0, price:5.9},
+			'CPA注册会计师': {name:'CPA注册会计师', item_id:1518, do_id:6000, width_px:178, height_px:220, file_size: 15, color: 'white', dpi:300, pop_content_tpl: 'pop-content-tpl-8', desc: "", jump_kefu: 0, price:9.9},
+			'自学考试毕业照': {name:'自学考试毕业照', item_id:1519, do_id:6000, dpi:300,  width_px:480, height_px:640, file_size: 30, pop_content_tpl: 'pop-content-tpl-1', desc: "", jump_kefu: 0, price:9.9},
+			'法考报名照': {name:'法考报名照', item_id:1520, do_id:6000, dpi:300, width_px:413, height_px:626, file_size: 65, all_colors: '蓝色,白色,红色', pop_content_tpl: 'pop-content-tpl-3', desc: "413×626px", jump_kefu: 0, price:9.9},
+			'港澳台和各国签证': {name:'港澳台和各国签证', item_id:1521, do_id:6000, all_md: qz_md, pop_content_tpl: 'pop-content-tpl-11', desc: "无回执", jump_kefu: 0, price:9.9},
+			
+			'简历照片': {name:'简历照片', item_id:6017, do_id:6000, width_px:295, height_px:413, dpi:300, beauty:0, pop_content_tpl: 'pop-content-tpl-1', file_size: 25, desc: "25×35mm 295×413px", logo: data_logo_map.logo1, jump_kefu: 0, price:5.9},
+			'退役军人优待证': {name:'退役军人优待证', item_id:6019, do_id:6000, dpi:300, width_px:352, height_px:440, file_size: 35, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "352×440px", jump_kefu: 0, price:9.9},
+			'兵役登记(全国征兵网)': {name:'兵役登记(全国征兵网)', item_id:6020, do_id:6000, dpi:350, width_px:358, height_px:441, file_size: 35, color: 'white', pop_content_tpl: 'pop-content-tpl-8', desc: "26×32mm 358×441px", jump_kefu: 0, price:9.9},
+			'中小学学籍照片': {name:'中小学学籍照片', item_id:6021, do_id:6000, dpi:350, width_px:358, height_px:441, file_size: 35, all_colors: '浅蓝色', pop_content_tpl: 'pop-content-tpl-3', desc: "26×32mm 358×441px", jump_kefu: 0, price:5.9},
+		};
+		
+		const data_item_list = ["自定义照片规格", "一寸照", "二寸照", "专升本", "交管12123驾驶证", "社保卡证件照(无回执)", '二级建造师', '公务员省考', '事业单位', '选调生', '自学考试报名照', '自学考试毕业照', '三支一扶', "计算机等级考试", '各省市教师招聘', '法考报名照', "会计考试报名照", "国家医学考试", '大学生西部计划', '社工报名照', "小一寸", "大一寸", "小二寸", "大二寸", "身份证电子照(无回执)", "健康证免冠个人照", "普通话水平测试", "高考报名", '中考报名', "英语四六级", "研究生报名考试", '中小学学籍照片', "入学证件照", "国家公务员(国考)", "军队文职", "中国卫生人才网", '简历照片'
+		, '中医经典能力考试', '西藏职称政治考试', 'CPA注册会计师', 'CATTI全国翻译专业', "教师资格证", '全国执业兽医', '退役军人优待证', '兵役登记(全国征兵网)', '黄委会', '公安辅警招聘', '深圳人事考评报名系统', '电子签名', '港澳台和各国签证', '全国人事考试服务平台', '中国人事考试网报名'
+		];
+		var color_map = {
+			'#0085FF': 'blue',
+			'#FF0000': 'red',
+			'#FFFFFF': 'white',
+			'#64C5FF': 'light_blue',
+			'#790303': 'deep_red',
+			'grad_blue_white': 'grad_blue_white',
+		};
+		var color_map_2 = {
+			'蓝色': '#0085FF',
+			'红色': '#FF0000',
+			'白色': '#FFFFFF',
+			'浅蓝色': '#64C5FF',
+			'暗红色': '#790303',
+			'蓝白渐变色': 'grad_blue_white',
+		};
+				
+		var track = window.location.host;
+		var admin_uid =  getParamsFromUrl('admin_uid')||localStorage.getItem('admin_uid')|| '';
+		localStorage.setItem('admin_uid',admin_uid);
+	</script>
+
+	<script src="img/pop3.js"></script>
+	<script type="text/javascript" src="img/uploader.js"></script>
+	
+</head>
+<body style="font-size: 12px;background:#edeef0;">
+	<div class="common-list-box" style="padding-top: 5px;">
+		<div class="common-list" id="common_list"><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo4.png" data-delay="150">
+				</div>
+				<span class="common-name">照片压缩</span>
+			</div><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo3.png" data-delay="150">
+				</div>
+				<span class="common-name">换底色</span>
+			</div><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo8.jpg" data-delay="150">
+				</div>
+				<span class="common-name">自定义</span>
+			</div><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo11.png" data-delay="150">
+				</div>
+				<span class="common-name">格式转换</span>
+			</div><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo12.jpg" data-delay="150">
+				</div>
+				<span class="common-name">电子排版照</span>
+			</div><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo1.png" data-delay="150">
+				</div>
+				<span class="common-name">一寸照</span>
+			</div><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo6.jpg" data-delay="150">
+				</div>
+				<span class="common-name">换正装</span>
+			</div><div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="img/csj_logo13.jpg" data-delay="150">
+				</div>
+				<span class="common-name">照片拼接</span>
+			</div></div>
+		<script id="tpl-common" type="text/html">
+			<div class="common-item" onclick="commonClick(this)">
+				<div class="common-icon">
+					<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAgAB/AYCChUAAAAASUVORK5CYII="  data-url="{logo}" data-delay="150"/>
+				</div>
+				<span class="common-name">{name}</span>
+			</div>
+		</script>
+		<style>
+			.common-list {
+				background:#edeef0;
+				display: flex;
+				gap: min(3vw, 20px);
+				width: 100%;
+				padding:5px 5px 15px;
+				//margin: 0 auto;
+				justify-content: center;
+				flex-wrap: wrap;
+			}
+			.common-item {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				width: min(18vw, 120px);
+				height:  min(18vw, 120px);
+				text-align: center;
+				border-radius: min(3vw, 24px);
+				padding: min(1vw, 10px);
+				background-color: white;
+				flex: 0 0 20vw;
+				transition: all 0.3s ease;
+				box-shadow: 0 2px 3px 3px rgb(0 0 0 / 3%);
+				background: linear-gradient(180deg, #fff, #fffbe6);
+			}
+			.common-item .common-icon {
+				width: min(7vw, 60px);
+				height: min(7vw, 60px);
+				background:linear-gradient(180deg, #fff, #fffbe6);
+				border-radius: min(2vw, 18px);
+				display: flex;
+				justify-content: center;
+				
+				align-items: center;
+				margin-bottom: min(2vw, 15px);
+				
+			}
+			.common-item .common-icon img {width: min(5.5vw, 40px); height: min(5.5vw, 40px); object-fit: contain;}
+			.common-item span {
+				font-size: min(0.30rem, 16px);
+				color: #333;
+				font-weight: bold;
+			}
+			@media (min-width: 768px) {
+				.common-list {
+					flex-wrap: nowrap;
+				}
+				.common-item {
+					flex: 1;
+				}
+			}
+		
+		</style>	
+		<script>
+			function renderCommon(commons_data){
+				document.getElementById('common_list').innerHTML = '';
+				for(var i=0;i<commons_data.length&&commons_data.length>0;i++){
+					var common_data = commons_data[i];
+					var popDiv = renderDomByTpl("tpl-common", common_data);
+					document.getElementById('common_list').appendChild(popDiv);
+				}
+			}
+			
+			function commonClick(element) {
+			  var commonNameElement = element.querySelector('.common-name');  
+			  if (commonNameElement) {  
+				var dataName = commonNameElement.textContent || commonNameElement.innerText;  
+				if (data_info_map[dataName]) {
+					data_info = data_info_map[dataName]
+					if (data_info.item_id == -1) {
+						popToast({title:'功能正在开发中',timeout:1500});
+					} else if (data_info.n_page) {
+						/*
+						if (admin_uid != 'demo') {
+							popToast({title:'功能正在开发中',timeout:1500});
+							return;
+						};
+						*/
+						var new_page = data_info.n_page;
+						if (admin_uid) {
+							new_page = `${data_info.n_page}?admin_uid=${admin_uid}`;
+						};
+						window.location.href = new_page;
+					} else {
+						dataClick(dataName);
+					}
+				}
+			  } 
+			}
+			function init_commons(){
+				// 加载本地tags数据
+				var tmp_commons_data = [];
+				common_names = ['照片压缩', '换底色', '自定义', '格式转换', '电子排版照', '一寸照', '换正装', '照片拼接']
+				for(var i=0;i<common_names.length;i++){
+					common_name = common_names[i];
+					if (common_name in data_info_map){
+						tmp_commons_data.push(data_info_map[common_name]);
+					}
+				}
+				renderCommon(tmp_commons_data);
+			}
+			init_commons();
+			setTimeout(function(){setupLazyLoad();},50);
+		</script>
+	</div>
+
+	<!--data-list-->
+	<div class="data-list-box" style="padding-bottom: 50px;">
+		<div id="data-list"><a class="single-item-wrapper" data_name="自定义照片规格" position_id="1" id="data_6004" onclick="dataClick('自定义照片规格')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>自定义照片规格</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">修改尺寸、背景色、kb</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="一寸照" position_id="2" id="data_6002" onclick="dataClick('一寸照')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>一寸照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">25×35mm 295×413px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="二寸照" position_id="3" id="data_6003" onclick="dataClick('二寸照')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>二寸照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">35×49mm 413×579px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="专升本" position_id="4" id="data_1505" onclick="dataClick('专升本')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>专升本</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">41×54mm 480×640px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="交管12123驾驶证" position_id="5" id="data_1501" onclick="dataClick('交管12123驾驶证')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>交管12123驾驶证</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">44×64mm 520×756px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="社保卡证件照(无回执)" position_id="6" id="data_1503" onclick="dataClick('社保卡证件照(无回执)')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>社保卡证件照(无回执)</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">26×32mm 358×441px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="二级建造师" position_id="7" id="data_1037" onclick="dataClick('二级建造师')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>二级建造师</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="公务员省考" position_id="8" id="data_1038" onclick="dataClick('公务员省考')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>公务员省考</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="事业单位" position_id="9" id="data_1039" onclick="dataClick('事业单位')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>事业单位</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="选调生" position_id="10" id="data_1040" onclick="dataClick('选调生')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>选调生</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="自学考试报名照" position_id="11" id="data_1041" onclick="dataClick('自学考试报名照')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>自学考试报名照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="自学考试毕业照" position_id="12" id="data_1519" onclick="dataClick('自学考试毕业照')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>自学考试毕业照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="三支一扶" position_id="13" id="data_1042" onclick="dataClick('三支一扶')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>三支一扶</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="计算机等级考试" position_id="14" id="data_1506" onclick="dataClick('计算机等级考试')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>计算机等级考试</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="各省市教师招聘" position_id="15" id="data_1046" onclick="dataClick('各省市教师招聘')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>各省市教师招聘</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="法考报名照" position_id="16" id="data_1520" onclick="dataClick('法考报名照')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>法考报名照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">413×626px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="会计考试报名照" position_id="17" id="data_1004" onclick="dataClick('会计考试报名照')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>会计考试报名照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="国家医学考试" position_id="18" id="data_1005" onclick="dataClick('国家医学考试')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>国家医学考试</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="大学生西部计划" position_id="19" id="data_1050" onclick="dataClick('大学生西部计划')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>大学生西部计划</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="社工报名照" position_id="20" id="data_1044" onclick="dataClick('社工报名照')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>社工报名照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="小一寸" position_id="21" id="data_6005" onclick="dataClick('小一寸')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>小一寸</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">22×32mm 260×378px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="大一寸" position_id="22" id="data_6006" onclick="dataClick('大一寸')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>大一寸</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">33×48mm 390×567px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="小二寸" position_id="23" id="data_6007" onclick="dataClick('小二寸')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>小二寸</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">35×45mm 413×531px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="大二寸" position_id="24" id="data_6008" onclick="dataClick('大二寸')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>大二寸</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">35×53mm 413×626px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="身份证电子照(无回执)" position_id="25" id="data_1500" onclick="dataClick('身份证电子照(无回执)')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>身份证电子照(无回执)</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">26×32mm 358×441px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="健康证免冠个人照" position_id="26" id="data_1502" onclick="dataClick('健康证免冠个人照')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>健康证免冠个人照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">26×32mm 358×441px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="普通话水平测试" position_id="27" id="data_1504" onclick="dataClick('普通话水平测试')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>普通话水平测试</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">33×48mm 390×567px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="高考报名" position_id="28" id="data_6015" onclick="dataClick('高考报名')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>高考报名</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="中考报名" position_id="29" id="data_1517" onclick="dataClick('中考报名')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>中考报名</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="英语四六级" position_id="30" id="data_6009" onclick="dataClick('英语四六级')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>英语四六级</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="研究生报名考试" position_id="31" id="data_6014" onclick="dataClick('研究生报名考试')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>研究生报名考试</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="中小学学籍照片" position_id="32" id="data_6021" onclick="dataClick('中小学学籍照片')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>中小学学籍照片</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">26×32mm 358×441px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="入学证件照" position_id="33" id="data_6012" onclick="dataClick('入学证件照')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>入学证件照</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="国家公务员(国考)" position_id="34" id="data_1001" onclick="dataClick('国家公务员(国考)')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>国家公务员(国考)</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="军队文职" position_id="35" id="data_1002" onclick="dataClick('军队文职')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>军队文职</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="中国卫生人才网" position_id="36" id="data_1003" onclick="dataClick('中国卫生人才网')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>中国卫生人才网</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="简历照片" position_id="37" id="data_6017" onclick="dataClick('简历照片')">
+				<!--img src=http://caipiao88.oss-cn-hangzhou.aliyuncs.com//csj/csj_logo1.jpg alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>简历照片</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">25×35mm 295×413px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="中医经典能力考试" position_id="38" id="data_1045" onclick="dataClick('中医经典能力考试')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>中医经典能力考试</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="西藏职称政治考试" position_id="39" id="data_1047" onclick="dataClick('西藏职称政治考试')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>西藏职称政治考试</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="CPA注册会计师" position_id="40" id="data_1518" onclick="dataClick('CPA注册会计师')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>CPA注册会计师</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="CATTI全国翻译专业" position_id="41" id="data_1048" onclick="dataClick('CATTI全国翻译专业')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>CATTI全国翻译专业</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="教师资格证" position_id="42" id="data_1507" onclick="dataClick('教师资格证')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>教师资格证</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="全国执业兽医" position_id="43" id="data_1514" onclick="dataClick('全国执业兽医')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>全国执业兽医</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="退役军人优待证" position_id="44" id="data_6019" onclick="dataClick('退役军人优待证')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>退役军人优待证</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">352×440px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="兵役登记(全国征兵网)" position_id="45" id="data_6020" onclick="dataClick('兵役登记(全国征兵网)')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>兵役登记(全国征兵网)</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">26×32mm 358×441px</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="黄委会" position_id="46" id="data_1043" onclick="dataClick('黄委会')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>黄委会</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="公安辅警招聘" position_id="47" id="data_1051" onclick="dataClick('公安辅警招聘')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>公安辅警招聘</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="深圳人事考评报名系统" position_id="48" id="data_1049" onclick="dataClick('深圳人事考评报名系统')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>深圳人事考评报名系统</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="电子签名" position_id="49" id="data_3" onclick="dataClick('电子签名')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>电子签名</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize"></span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="港澳台和各国签证" position_id="50" id="data_1521" onclick="dataClick('港澳台和各国签证')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>港澳台和各国签证</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">无回执</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="全国人事考试服务平台" position_id="51" id="data_1036" onclick="dataClick('全国人事考试服务平台')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>全国人事考试服务平台</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a><a class="single-item-wrapper" data_name="中国人事考试网报名" position_id="52" id="data_1000" onclick="dataClick('中国人事考试网报名')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>中国人事考试网报名</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">已审核，直接上传</span>
+					</div>
+				</div>
+			</a></div>
+		<script id="tpl-data-item" type="text/html">
+			<a class="single-item-wrapper" data_name="{name}" position_id={position_id} id={data_id} onclick="dataClick('{name}')">
+				<!--img src={logo} alt=""-->
+				<div class="basic-info">
+					<div class="name">
+						<span>{name}</span>
+					</div>
+					<div class="size-compose">
+						<span class="backSize">{desc}</span>
+					</div>
+				</div>
+			</a>
+		</script>
+		<style>
+			#data-list{
+			    display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				//gap: 10px;
+				max-width: 2000px;
+				margin: 0 5px;
+			}
+			.single-item-wrapper {
+				background: #FFFFFF;
+				border-radius: 0.2rem;
+				padding: 0.2rem;
+				//box-sizing: border-box;
+				height: 100px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				margin: 5px;
+				text-align: center;
+			}
+			.single-item-wrapper > img {
+				width: 1.09333333rem;
+				min-width: 1.09333333rem;
+				height: 1.06666667rem;
+				min-height: 1.06666667rem;
+				margin-right: 0.34666667rem;
+				object-fit: contain;
+				display:none;
+			}
+			.single-item-wrapper .basic-info {
+			  display: -ms-flexbox;
+			  display: flex;
+			  -ms-flex-direction: column;
+			  flex-direction: column;
+			  overflow: hidden;
+			}
+
+			.single-item-wrapper .basic-info .name span {
+			  font-size: 0.36rem;
+			  font-family: PingFangSC-Medium, PingFang SC;
+			  font-weight: 500;
+			  color: #1E202B;
+			  line-height: 0.42666667rem;
+			}
+
+			.single-item-wrapper .basic-info .name .hot {
+			  width: 0.8rem;
+			  height: 0.42666667rem;
+			  margin-left: 0.10666667rem;
+			}
+
+			.single-item-wrapper .basic-info .name img {
+			  margin-left: 0.13333333rem;
+			  width: 0.8rem;
+			  height: 0.45333333rem;
+			}
+
+			.single-item-wrapper .basic-info .size-compose {
+			  color: #999BA9;
+			  margin-top: 0.2rem;
+			  overflow: hidden;
+			}
+
+			.single-item-wrapper .basic-info .size-compose span {
+			  font-size:13px;
+			}
+
+			.single-item-wrapper:active {
+			  background: #F4F5F9;
+			}
+		</style>
+		<script>
+			function renderDataList(data_list){
+				document.getElementById('data-list').innerHTML = '';
+				for(var i=0;i<data_list.length&&data_list.length>0;i++){
+					var data_name = data_list[i];
+					if (data_name in data_info_map) {
+						var data_info = data_info_map[data_name]
+						data_info.position_id = i+1
+						data_info.data_id = 'data_' + data_info.item_id
+						var popDiv = renderDomByTpl("tpl-data-item", data_info);
+						document.getElementById('data-list').appendChild(popDiv);
+						
+					}
+				}
+			}
+			function init_data_list(){
+				renderDataList(data_item_list);
+			}
+			init_data_list();
+		</script>	
+	</div>
+	<div class="controls-bottom-btns">
+		<!--
+		<a class="controls-btns-item" href="#">
+			<svg t="1693620742374" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4096" width="20" height="20">
+				<path d="M921.6 102.4v358.4h-256V102.4h256M358.4 102.4v153.6H102.4V102.4h256m0 460.8v358.4H102.4v-358.4h256m563.2 204.8v153.6h-256v-153.6h256m0-768h-256c-56.32 0-102.4 46.08-102.4 102.4v358.4c0 56.32 46.08 102.4 102.4 102.4h256c56.32 0 102.4-46.08 102.4-102.4V102.4c0-56.32-46.08-102.4-102.4-102.4zM358.4 0H102.4C46.08 0 0 46.08 0 102.4v153.6c0 56.32 46.08 102.4 102.4 102.4h256c56.32 0 102.4-46.08 102.4-102.4V102.4c0-56.32-46.08-102.4-102.4-102.4z m0 460.8H102.4c-56.32 0-102.4 46.08-102.4 102.4v358.4c0 56.32 46.08 102.4 102.4 102.4h256c56.32 0 102.4-46.08 102.4-102.4v-358.4c0-56.32-46.08-102.4-102.4-102.4z m563.2 204.8h-256c-56.32 0-102.4 46.08-102.4 102.4v153.6c0 56.32 46.08 102.4 102.4 102.4h256c56.32 0 102.4-46.08 102.4-102.4v-153.6c0-56.32-46.08-102.4-102.4-102.4z" fill="currentColor" p-id="4097"></path>
+			</svg>
+			<span>首页</span>
+		</a>
+		<a class="controls-btns-item" href="https://70.900.vc/csj_order_problem.html">
+			<svg width="23px" height="23px" viewBox="0 0 20 20" preserveAspectRatio="xMidYMid meet" fill="none" role="presentation" xmlns="http://www.w3.org/2000/svg" class="tab-title__icon">
+				<g>
+					<path data-follow-fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M9.013 2.867A7.251 7.251 0 0 1 10 2.8m-.987.067A8.204 8.204 0 0 0 17.156 9.2a7.156 7.156 0 0 0-.744-2.477 7.216 7.216 0 0 0-4.629-3.7A7.213 7.213 0 0 0 10 2.8m7.156 7.999L17 10.8c-4.635 0-8.517-3.217-9.538-7.54a7.2 7.2 0 1 0 9.694 7.539ZM10 1.2c-.746 0-1.471.093-2.163.268l-.644.158.004.03a8.8 8.8 0 1 0 11.578 9.008l.03-.003-.005-.703a8.791 8.791 0 0 0-3.88-7.255A8.76 8.76 0 0 0 10 1.2Z" fill="currentColor"></path>
+				</g>
+			</svg>
+			<span>联系客服</span>
+		</a>
+		<a class="controls-btns-item" href="https://70.900.vc/csj_order_my.html">
+			<img style="width:23px;height:23px;" src="%E8%AF%81%E4%BB%B6%E7%85%A7%E5%88%B6%E4%BD%9C_files/my.png">
+			<span style="font-weight: bold;color:#66f;">我的订单</span>
+		</a>
+		-->
+		<style>
+			.controls-bottom-btns{position: fixed;padding: 3px 5px;display:flex;color:#fff;align-items: center;justify-content:space-around;font-size:12px;cursor:pointer;user-select: none;-webkit-user-select: none;-webkit-tap-highlight-color: transparent;left:0px;bottom:0px;width:100%;background:#f7f7f7;z-index:19;border-top:1px solid #d4d4d4;}
+			.controls-btns-item{padding: 3px 10px;display:flex;color:#000;align-items: center;justify-content: space-between;font-size:12px;cursor:pointer;flex-direction: column;margin-bottom:0px;user-select: none;text-decoration:none;}
+			.controls-btns-item-selected{color:#66f;}
+		</style>
+		<script>
+			(function(){
+				var path = window.location.pathname;
+				if(path !='/'){
+					var pos1 = path.lastIndexOf('/');
+					path = path.substring(pos1+1);
+				}
+				
+				if(document.querySelector('.controls-btns-item-selected')) //删除所有选中项
+					document.querySelector('.controls-btns-item-selected').classList.remove('controls-btns-item-selected');
+				if(document.querySelector('.controls-btns-item[href$="'+path+'"]'))
+					document.querySelector('.controls-btns-item[href$="'+path+'"]').classList.add('controls-btns-item-selected');
+			})();
+		</script>
+	</div>
+	
+	<div class="pop-info-photo" id="popInfoPhoto" style="display: none;">
+		<div class="pop-info-content-photo">
+			<div class="content-head-photo">
+				<img onclick="popInfoPhotoHidden()" src="img/csj_icon0.png">
+				<div class="name">一寸照</div>
+				<div class="support">
+					<div>
+						<img src="img/csj_icon2.png">
+						<span>支持保存电子版</span>
+					</div>
+					<div>
+						<img src="img/csj_icon1.png">
+						<span>不支持冲印邮寄</span>
+					</div>
+				</div>
+				<div class="photo-req" id="photoReq"></div>
+			</div>
+			<div class="content-tail-photo">
+				<div class="photo-upload" onclick="btnUploadImg()">
+					<div class="photo-btn">点此从相册导入照片</div>
+				</div>
+			</div>
+		</div>
+		<style>
+		.pop-info-photo {
+		  width: 100%;
+		  position: fixed;
+		  top: 0;
+		  height: 100%;
+		  background: rgba(0, 0, 0, 0.5);
+		  z-index: 20;
+		  display: none;
+		}
+
+		.pop-info-photo .pop-info-content-photo {
+		  background: #ffffff;
+		  width: 100vw;
+		  padding: 0.10666667rem 0.42666667rem 0.8rem 0.42666667rem;
+		  border-radius: 0.32rem 0.32rem 0 0;
+		  background-size: contain;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		  -ms-flex-align: center;
+		  align-items: center;
+		  position: fixed;
+		  bottom: 0;
+		  z-index: 21;
+		  max-height: 90%;
+		  overflow: auto;
+		  height: auto;
+		}
+		
+		/* content-tail */
+		.pop-info-content-photo .content-head-photo {
+		  width: 100vw;
+		  padding: 0.10666667rem 0.42666667rem 0.1rem 0.42666667rem;
+		}
+		.pop-info-content-photo .content-head-photo > img {
+			height: 0.85333333rem;
+			display: block;
+			margin: 0 auto;
+		}
+		.pop-info-content-photo .content-head-photo .name {
+		  font-size: 0.56rem;
+		  font-family: PingFangSC-Medium, PingFang SC;
+		  font-weight: 500;
+		  color: #1E202B;
+		  /*margin-left: 0.10666667rem;*/
+		  text-align: center;
+		}
+		
+		.pop-info-content-photo .content-head-photo .photo-req {
+		  font-size: 0.4rem;
+		  color: red;
+		  margin-top: 10px;
+		  margin-bottom: 30px;
+		  line-height: 1.5;
+		  padding:0 30px;
+		}
+		
+		.pop-info-content-photo .content-head-photo .photo-req >div span {
+		  color: black;
+		  text-align: left;
+		}
+		
+		.pop-info-content-photo .content-head-photo .support {
+		  display: -ms-flexbox;
+		  display: flex;
+		  margin-top: 0.3rem;
+		  margin-left: 0.5rem;
+		  margin-right: 0.5rem;
+		  margin-bottom: 0.8rem;
+		}
+		
+		.pop-info-content-photo .content-head-photo .support > div {
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-align: center;
+		  align-items: center;
+		  text-align: center;
+		  margin: 0 auto;
+		}
+		.pop-info-content-photo .content-head-photo .support > div img {
+		  width: 0.42666667rem;
+		  height: 0.42666667rem;
+		  margin-right: 0.08rem;
+		}
+		.pop-info-content-photo .content-head-photo .support > div span {
+		  font-size: 0.32rem;
+		  color: #999BA9;
+		  line-height: 0.32rem;
+		}
+		
+		.content-tail-photo .photo-upload {
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-pack: justify;
+		  justify-content: space-between;
+		  cursor: pointer;
+		}
+		
+		.content-tail-photo .photo-upload .photo-btn {
+		  width: 5rem;
+		  height: 1.3rem;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-align: center;
+		  align-items: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		  border-radius: 0.66666667rem;
+		  font-size: 0.42666667rem;
+		  background-color: #7F6AFF;
+		  color: #FFFFFF;
+		  font-family: PingFangSC-Medium, PingFang SC;
+		  font-weight: 500;
+		  text-align: center;
+		}
+		</style>
+		<script>
+			// 给父div添加点击事件
+			var popInfoDiv1 = document.getElementById('popInfoPhoto');
+			popInfoDiv1.addEventListener('click', function(event) {
+				if (event.target === popInfoDiv1) {
+					console.log("aaa");
+					popInfoDiv1.style.display = "none";
+				}
+			});
+			
+			var data_name = ""
+			var photo_params = {}
+			function dataClick() {
+				//data_name = _data_name;
+				data_name = arguments[0];
+				var flag = arguments.length>1?arguments[1]:'';
+				photo_params = {...data_info_map[data_name]};
+				photo_params.flag = flag;
+				if(window.hasOwnProperty('cswtj')) {  
+					cswtj.log({a:'clickItem',w:photo_params.item_id,d:''});  
+				}; 
+				
+				// 新页面
+				if (photo_params.n_page) {
+					var new_page = photo_params.n_page;
+					if (admin_uid) {
+						new_page = `${photo_params.n_page}?admin_uid=${admin_uid}`;
+					};
+					window.location.href = new_page;
+					return;
+				};
+				
+				
+				//展示
+				document.querySelector(".pop-info-photo").style.display = "block";
+				var nameDiv1 = document.querySelector(".pop-info-content-photo .content-head-photo .name");
+				if (nameDiv1) {
+					nameDiv1.textContent=data_name;
+				};
+				var photoReqDiv = document.getElementById('photoReq');
+				if (photo_params.item_id == 1501) {
+					photoReqDiv.innerHTML = "<div style='text-align: center;'><b>【必看!!!】</b></div><div><span>①一定不要穿白色、浅色的衣服</span><br><span>②一定不要美颜、滤镜、浓妆、修图</span><br><span>③身体和头部的姿势要端正</span></div>";
+				} else if (photo_params.item_id == 1502) {
+				    photoReqDiv.innerHTML = "<div style='text-align: center;'><b>【制作前必看!!!】</b></div><div><span style='font-weight: bold;'>【此照片是申领健康证的免冠电子个人照，不是办健康证】</span></div>";
+				} else if (photo_params.item_id == 1507) {
+					photoReqDiv.innerHTML = "<div style='text-align: center;'><b>【必看注意事项!!!】</b></div><div><span style='font-weight: bold;'>【制作完成后，中小学教师资格考试报名照片必须用电脑上传，手机无法上传！】</span></div>";
+				} else {
+					photoReqDiv.innerHTML = "";
+				};
+			};
+			function popInfoPhotoHidden() {
+				document.querySelector(".pop-info-photo").style.display = "none";
+			};
+			
+			function calPixelScale(pixel) {
+				if (pixel > 2500) {
+					return 0.3;
+				} else if (pixel < 750) {
+					return 1;
+				} else {
+					return Number((1.3 - pixel/2500).toFixed(2));
+				}
+			};
+			
+			
+			
+			function extractHttpLink(text) {
+				const httpUrlRegex = /(\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+				const found = text.match(httpUrlRegex);
+				return found?found[0]:text;
+			};
+			
+			async function upload_file(file) {
+				// 获取文件大小（KB）,格式
+				photo_params.ori_file_size = parseInt(file.size / 1024);
+				photo_params.ori_file_format = file.name.split('.').pop();
+				console.log(photo_params.ori_file_size); // 转换为 KB
+				
+				// 创建一个新的图像对象以获取尺寸
+				const img = new Image();
+				img.src = URL.createObjectURL(file); // 创建临时 URL
+				var dimensions = await new Promise((resolve, reject) => {
+					img.onload = function() {
+						const width = img.width;
+						const height = img.height;
+						resolve({width, height});
+					};
+					img.onerror = function() {   
+						resolve(null);
+					}; 
+				});
+				if (!dimensions) {
+					console.log("fail")
+					return "fail";
+				} else {
+					photo_params.ori_width_px = dimensions.width;
+					photo_params.ori_height_px = dimensions.height;	
+				};
+				console.log(photo_params.ori_width_px, photo_params.ori_height_px);
+							
+				
+				// 将文件转换为 Buffer 对象（这里实际上是 ArrayBuffer）
+				var file_obj = await $uploader.fileToBuffer(file);
+				// 上传文件到oss文件服务器
+				var file_url = await $uploader.uploadFile(Object.assign(file_obj, {filename:'/csj/ori_photo/'+getCurrentDate()+'/'+Date.now()+file_obj.suffix}));
+				//toastDiv.closeSelf();
+				if(file_url&&file_url.indexOf('http')>-1) {
+					return new Promise(function(resolve,reject){
+						resolve(file_url);
+					});
+				} else {
+					return "fail"
+					//popToast({title:'上传失败，重新上传',timeout:3*1000});
+				};
+			}
+			
+			async function btnUploadImg(){
+				if(window.hasOwnProperty('cswtj')){
+					cswtj.log({a:'clickUploadImg',w:photo_params.item_id,d:''});  
+				}; 
+				//先确保照片上传成功
+				var file = await $uploader.fileChoose({accept: "image/*"});
+				var toastDiv = popToast({title:'照片上传中',icon:'loading',timeout:60*1000});
+				var file_url = await upload_file(file);
+				if (file_url == 'fail') {
+					toastDiv.closeSelf();
+					popToast({title:'上传失败，重新上传', timeout:2*1000});
+				} else {
+					photo_params.ori_img_url = file_url;
+					if (photo_params.item_id == 1) {
+						var id_photo_status = await add_detect_task(file_url);
+						console.log(id_photo_status);
+						if (id_photo_status == 1) {
+							photo_params.do_id = 6000;
+							photo_params.pop_content_tpl = 'pop-content-tpl-4';
+							//photo_params.price = 1.9;
+							//photo_params.order_result_id = 3;
+						}
+					};
+					
+					if (photo_params.item_id == 1002 || photo_params.item_id == 1505) {
+						var std_result = await add_std_task(file_url);
+						if (std_result > 5) {
+							popToast({title:'非个人照,切换到【照片压缩】<br>如有问题，联系客服！', timeout:6*1000});
+							var new_photo_params = {...data_info_map['照片压缩']};
+							new_photo_params.ori_img_url = photo_params.ori_img_url;
+							new_photo_params.ori_file_size = photo_params.ori_file_size;
+							new_photo_params.ori_width_px = photo_params.ori_width_px;
+							new_photo_params.ori_height_px = photo_params.ori_height_px;
+							new_photo_params.ori_file_format = photo_params.ori_file_format;
+							photo_params = new_photo_params;
+							data_name = '照片压缩';
+						}
+					};
+					
+					if (photo_params.item_id == 6000) {
+						var id_photo_status = await add_detect_task(file_url);
+						if (id_photo_status == 0) {
+							photo_params.do_id = 6001;
+							photo_params.pop_content_tpl = 'pop-content-tpl-10';
+						};
+						/*
+						if (parseInt(getUserId())%10>=5) {
+							photo_params.do_id = 6001;
+							photo_params.pop_content_tpl = 'pop-content-tpl-10';
+						};
+						*/
+					};
+					
+					
+					// 生成、获取跳转微信客服的链接
+					var order_id = getId();
+					photo_params.order_id = order_id;
+					toastDiv.closeSelf();
+					
+					// 此处隐藏照片弹窗 
+					popInfoPhotoHidden();
+					var popDiv2 = document.querySelector(".pop-info");
+					if (popDiv2) {
+						popDiv2.classList.add('pop-info-show');
+					}
+					
+					// 根据模板填充内容name
+					var nameDiv2 = document.querySelector(".pop-info-content .content-head .name");
+					if (nameDiv2) {
+						nameDiv2.textContent = data_name;
+					}
+					console.log(photo_params.pop_content_tpl);
+					var dataHtml = getHtmlByTpl(photo_params.pop_content_tpl, photo_params);
+					document.getElementById('contentMid').innerHTML = dataHtml;
+					
+					if (photo_params.pop_content_tpl == 'pop-content-tpl-7' || photo_params.pop_content_tpl == 'pop-content-tpl-9') {
+						var pixelSelect = document.getElementById('pixelSelectV1');
+						pixel_pairs = photo_params.all_pixels.split(',');
+						pixel_pairs.forEach(function(pixelPair) {
+							var option = document.createElement('option');   
+							option.textContent = option.value = pixelPair;
+							pixelSelect.appendChild(option); 
+						});
+					};
+					
+					if (photo_params.pop_content_tpl == 'pop-content-tpl-3') {
+						var colorSelectDiy = document.getElementById('colorSelectDiy');
+						color_array = photo_params.all_colors.split(',');
+						color_array.forEach(function(color_name) {
+							var option = document.createElement('option');
+							option.textContent = color_name;
+							option.value = color_map_2[color_name];
+							colorSelectDiy.appendChild(option);
+						});
+					};
+					
+					if (photo_params.pop_content_tpl == 'pop-content-tpl-11') {
+						var provSelect = document.getElementById('provSelect');
+						var prov_mds = photo_params.all_md.split(';');
+						prov_mds.forEach(function(prov_md) {
+							var option = document.createElement('option');   
+							option.textContent = prov_md.split(',')[0];
+							option.value = prov_md;
+							provSelect.appendChild(option);
+						});
+					};
+					
+					if (document.getElementById('dpiInput')) {
+						updateDpiDisplay(3);
+					};
+					
+					// updateFileSizeDisplay
+					if (document.getElementById('fileSize')) {
+						photo_params.file_size = parseInt(document.getElementById('fileSize').value, 10);
+					};
+					
+					// initFileSizeDisplay
+					if (document.getElementById('fileSizeInit1')) {
+						const fileSizeDiv = document.getElementById('fileSizeInit1');
+						fileSizeDiv.value = photo_params.file_size;
+						if (photo_params.item_id == 6000) {
+							photo_params.file_size = photo_params.ori_file_size>300?300:photo_params.ori_file_size;
+							fileSizeDiv.value = photo_params.file_size;
+						}
+					};
+					// widthPxInit1 heightPxInit1
+					if (document.getElementById('widthPxInit1')) {
+						const widthPxDiv = document.getElementById('widthPxInit1');
+						const heightPxDiv = document.getElementById('heightPxInit1');
+						
+						var ratio_height_width = heightPxDiv.value / widthPxDiv.value;
+						if (ratio_height_width > 1.5) {
+							heightPxDiv.value = parseInt(widthPxDiv.value*4/3);
+						} else if (ratio_height_width < 1) {
+							widthPxDiv.value = parseInt(heightPxDiv.value*3/4);
+						};
+						
+						if (widthPxDiv.value > 2000 && widthPxDiv.value >= heightPxDiv.value) {
+							heightPxDiv.value = parseInt(2000*heightPxDiv.value/widthPxDiv.value);
+							widthPxDiv.value = 2000;
+						} else if (heightPxDiv.value > 2000 && heightPxDiv.value >= widthPxDiv.value) {
+							widthPxDiv.value = parseInt(2000*widthPxDiv.value/heightPxDiv.value);
+							heightPxDiv.value = 2000;
+						};
+						console.log(widthPxDiv.value, heightPxDiv.value);
+						photo_params.height_px = parseInt(heightPxDiv.value, 10);
+						photo_params.width_px = parseInt(widthPxDiv.value, 10);
+					};
+					if (document.getElementById('pixelScale')) {
+						var scale_factor = 1;
+						if (photo_params.ori_height_px >= photo_params.ori_width_px) {
+							scale_factor = calPixelScale(photo_params.ori_height_px);
+						} else {
+							scale_factor = calPixelScale(photo_params.ori_width_px);
+						}
+						const pixelScaleDiv = document.getElementById('pixelScale');
+						pixelScaleDiv.value = scale_factor;
+						updatePixelScale(scale_factor);
+					};
+					
+					photo_params.beauty = 0;
+					console.log(photo_params);
+				}
+				
+			}
+			
+
+		</script>
+	</div>
+	<div class="pop-info" id="popInfo">
+		<div class="pop-info-content">
+			<div class="content-head">
+				<img onclick="popInfoHidden()" src="img/csj_icon0.png">
+				<div class="name">一寸照</div>
+				<div class="support">
+							<div>
+								<span>
+									确认信息无误后点击提交
+								</span>
+							</div>
+				</div>
+			</div>
+			<div class="content-mid" id="contentMid">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小62KB，像素尺寸800×1642px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="" selected="selected">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">分辨率(DPI)</div>
+				<div class="item-value">300</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">像素尺寸(宽×高)</div>
+				<div class="item-value">
+					<div class="pixel-display" id="pixelDisplay">295×413px</div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">文件大小(KB)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input class="file-size-input required-input" id="fileSizeInit1" type="number" value="50" oninput="updateFileSize(this.value)" style="max-width: 45px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</div>
+			<div class="content-tail">
+				<div class="photo-upload" onclick="create_order()">
+					<div class="photo-btn">
+						确认提交
+					</div>
+				</div>
+			</div>
+		</div>
+		<style>
+		.pop-info {
+		  width: 100%;
+		  position: fixed;
+		  top: 0;
+		  height: 100%;
+		  background: rgba(0, 0, 0, 0.5);
+		  z-index: 20;
+		  display: none;
+		}
+
+		.pop-info-show {
+		  display: block;
+		}
+		
+
+		.pop-info .pop-info-content {
+		  background: #ffffff;
+		  width: 100vw;
+		  /* padding: 0.16rem 0 0.53333333rem 0; */
+		  padding: 0.10666667rem 0.42666667rem 0.8rem 0.42666667rem;
+		  border-radius: 0.32rem 0.32rem 0 0;
+		  background-size: contain;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		  -ms-flex-align: center;
+		  align-items: center;
+		  position: fixed;
+		  bottom: 0;
+		  z-index: 21;
+		  max-height: 90%;
+		  overflow: auto;
+		}
+		
+		/* content-head */
+		.pop-info-content .content-head {
+		  width: 100vw;
+		  padding: 0.1rem 0.42666667rem 0.1rem 0.42666667rem;
+		}
+		.pop-info-content .content-head > img {
+			height: 0.85333333rem;
+			display: block;
+			margin: 0 auto;
+		}
+		.pop-info-content .content-head .name {
+		  font-size: 0.56rem;
+		  font-family: PingFangSC-Medium, PingFang SC;
+		  font-weight: 500;
+		  color: #1E202B;
+		  /*margin-left: 0.10666667rem;*/
+		  text-align: center;
+		}
+		.pop-info-content .content-head .support {
+		  display: -ms-flexbox;
+		  display: flex;
+		  margin: 0.37333333rem 0.3rem;
+		}
+		.pop-info-content .content-head .support > div {
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-align: center;
+		  align-items: center;
+		  /*margin-right: 0.53333333rem;*/
+		  text-align: center;
+		  margin: 0 auto;
+		}
+		.pop-info-content .content-head .support > div img {
+		  width: 0.42666667rem;
+		  height: 0.42666667rem;
+		  margin-right: 0.08rem;
+		}
+		.pop-info-content .content-head .support > div span {
+		  font-size: 0.32rem;
+		  color: #999BA9;
+		  line-height: 0.32rem;
+		}
+		
+		
+		/* content-mid */
+		.pop-info-content .content-mid {
+		  width: 100%;
+		  margin-top: 0.1rem;
+		  background: rgba(0, 0, 0, 0.03);
+		  border-radius: 0.21333333rem;
+		  padding: 0.15rem 0.48rem 0.42rem 0.48rem;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		   margin-bottom: 0.5rem;
+		}
+		
+		.pop-info-content .content-mid .other-item {
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-pack: justify;
+		  justify-content: space-between;
+		  margin-bottom: 0.2rem;
+		  margin-top: 0.2rem;
+		}
+		
+		.pop-info-content .content-mid .other-item .item-title {
+		  font-size: 0.32rem;
+		  color: #999BA9;
+		  line-height: 0.32rem;
+		}
+
+		.pop-info-content .content-mid .other-item .item-value {
+		  max-width: 4.8rem;
+		  font-size: 0.32rem;
+		  line-height: 0.32rem;
+		  color: #1E202B;
+		  text-align: right;
+		  display: flex;
+		}
+		
+		.pop-info-content .content-mid .other-item .item-value .color-preview  {
+			margin-left: 0.1rem;
+			width: 0.5rem;
+			height: 100%;
+		}
+		
+		.pop-info-content .content-mid .other-item .item-value .dpi-display  {
+			margin-left: 0.1rem;
+			width: 0.5rem;
+			height: 100%;
+		}
+		
+		.pop-info-content .content-mid .other-item .item-value .file-size  {
+			accent-color: red;
+		}
+		
+		.pop-info-content .content-mid .other-item .item-value .file-size-display  {
+			margin-left: 0.1rem;
+			width: 0.5rem;
+			height: 100%;
+		}
+		
+		.pop-info-content .content-mid .input-error-message {
+		    display: none;
+            //color: red;
+			//text-align: center;
+			//font-size: 0.32rem;
+        }
+		
+		.content-tail .photo-upload {
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-pack: justify;
+		  justify-content: space-between;
+		  cursor: pointer;
+		}
+		
+		.content-tail .photo-upload .photo-btn {
+		  width: 4.4rem;
+		  height: 1.28rem;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -ms-flex-align: center;
+		  align-items: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		  border-radius: 0.66666667rem;
+		  font-size: 0.42666667rem;
+		  background-color: #7F6AFF;
+		  color: #FFFFFF;
+		  font-family: PingFangSC-Medium, PingFang SC;
+		  font-weight: 500;
+		  text-align: center;
+		}
+		
+		</style>
+		<script id="pop-content-tpl-0" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title" for="inputA">分辨率(DPI)</div>
+				<div class="item-value">
+					<input  class="dpi-input" type="range" id="dpiInput" step="1" value="3" min="0" max="5" oninput="updateDpiDisplay(this.value)">
+					<div class="dpi-display" id="dpiDisplay">300</div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">像素尺寸(宽×高)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="pixel-width-input required-input" placeholder="宽度" type="number" oninput="updatePixelWidth(this.value)" style="max-width: 45px;">
+					<span>×</span>
+					<input  class="pixel-height-input required-input" placeholder="高度" type="number" oninput="updatePixelHeight(this.value)" style="max-width: 45px;">
+					<span>&nbsp;像素(px)</span>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">文件大小(KB)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="file-size-input required-input" id="fileSizeInit1" type="number" value="50" oninput="updateFileSize(this.value)" style="max-width: 45px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		<script id="pop-content-tpl-1" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">分辨率(DPI)</div>
+				<div class="item-value">300</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">像素尺寸(宽×高)</div>
+				<div class="item-value">
+					<div class="pixel-display" id="pixelDisplay">{width_px}×{height_px}px</div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">文件大小(KB)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="file-size-input required-input" id="fileSizeInit1" type="number" value="50" oninput="updateFileSize(this.value)" style="max-width: 45px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		<script id="pop-content-tpl-2" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title" for="inputA">分辨率(DPI)</div>
+				<div class="item-value">
+					<input  class="dpi-input" type="range" id="dpiInput" step="1" value="3" min="0" max="5" oninput="updateDpiDisplay(this.value)">
+					<div class="dpi-display" id="dpiDisplay">300</div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">像素尺寸(宽×高)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="pixel-width-input required-input" id="widthPxInit1" placeholder="宽度" value='{ori_width_px}' type="number" oninput="updatePixelWidth(this.value)" style="max-width: 45px;">
+					<span>×</span>
+					<input  class="pixel-height-input required-input" id="heightPxInit1" placeholder="高度" value='{ori_height_px}' type="number" oninput="updatePixelHeight(this.value)" style="max-width: 45px;">
+					<span>&nbsp;像素(px)</span>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">文件大小(KB)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="file-size-input required-input" id="fileSizeInit1" type="number" value='300' oninput="updateFileSize(this.value)" style="max-width: 60px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		
+		<script id="pop-content-tpl-3" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select-diy required-input" id="colorSelectDiy" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">分辨率(DPI)</div>
+				<div class="item-value">{dpi}</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">像素尺寸(宽×高)</div>
+				<div class="item-value">
+					<div class="pixel-display" id="pixelDisplay">{width_px}×{height_px}px</div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">文件大小(KB)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="file-size-input required-input" id="fileSizeInit1" type="number" value="45" oninput="updateFileSize(this.value)" style="max-width: 45px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		
+		<script id="pop-content-tpl-4" type="text/html">
+			<div class="other-item">
+				<div class="item-title">压缩前文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title" for="inputA">分辨率(DPI)</div>
+				<div class="item-value">
+					<input  class="dpi-input" type="range" id="dpiInput" step="1" value="3" min="0" max="5" oninput="updateDpiDisplay(this.value)">
+					<div class="dpi-display" id="dpiDisplay">300</div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">像素尺寸(宽×高)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="pixel-width-input required-input" id="widthPxInit1" placeholder="宽度" value='{ori_width_px}' type="number" oninput="updatePixelWidth(this.value)" style="max-width: 45px;">
+					<span>×</span>
+					<input  class="pixel-height-input required-input" id="heightPxInit1" placeholder="高度" value='{ori_height_px}' type="number" oninput="updatePixelHeight(this.value)" style="max-width: 45px;">
+					<span>&nbsp;像素(px)</span>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">压缩后文件大小<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="file-size-input required-input" type="number" oninput="updateFileSize(this.value)" style="max-width: 45px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		
+		<script id="pop-content-tpl-5" type="text/html">
+			<div class="other-item">
+				<div class="item-title">压缩前文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">压缩后像素尺寸</div>
+				<div class="item-value">
+					<input  class="pixel-scale" type="range" id="pixelScale" style="max-width: 80px;" step="0.05" value="1" min="0.2" max="1" oninput="updatePixelScale(this.value)">
+					<div class="pixel-scale-display" id="pixelScaleDisplay">{ori_width_px}×{ori_height_px}px</div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">压缩后文件大小<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="file-size-input required-input" type="number" oninput="updateFileSize(this.value)" style="max-width: 45px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写目标文件大小！</div>
+		</script>
+		
+		<script id="pop-content-tpl-6" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			
+			<div class="other-item">
+				<div class="item-title">原图片格式</div>
+				<div class="item-value">{ori_file_format}</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					目标格式<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="format-select required-input" id="formatSelect" onchange="updateFormat(this.value)">
+						<option value="">请选择目标格式</option>
+						<option value="jpg">jpg</option>
+						<option value="png">png</option>
+						<option value="jpeg">jpeg</option>
+					</select>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请选择目标文件格式！</div>
+		</script>
+		<script id="pop-content-tpl-7" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">分辨率(DPI)</div>
+				<div class="item-value">300</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					像素尺寸(宽×高)<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="pixel-select-v1 required-input" id="pixelSelectV1" onchange="updatePixelV1(this.value)">
+						<option value="">选择像素尺寸</option>
+					</select>
+					px
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">文件大小(KB)<span style="color: red;">*</span></div>
+				<div class="item-value">
+					<input  class="file-size-input required-input" id="fileSizeInit1" type="number" value="100" oninput="updateFileSize(this.value)" style="max-width: 45px;">
+					<span>KB左右</span>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		
+		<script id="pop-content-tpl-8" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色
+				</div>
+				<div class="item-value">
+					白色
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">分辨率(DPI)</div>
+				<div class="item-value">{dpi}</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">像素尺寸(宽×高)</div>
+				<div class="item-value">
+					<div class="pixel-display" id="pixelDisplay">{width_px}×{height_px}px</div>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		<script id="pop-content-tpl-9" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					照片尺寸<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="pixel-select-v1 required-input" id="pixelSelectV1" onchange="updatePixelV1(this.value)">
+						<option value="">请选照片尺寸</option>
+					</select>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">您还有条目没有选择或填写！</div>
+		</script>
+		<script id="pop-content-tpl-10" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					背景颜色<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="color-select required-input" id="colorSelect" onchange="updateColorPreview(this.value)">
+						<option value="">请选底色</option>
+						<option value="#0085FF">蓝色</option>
+						<option value="#FFFFFF">白色</option>
+						<option value="#FF0000">红色</option>
+						<option value="#64C5FF">浅蓝色</option>
+						<option value="grad_blue_white">蓝白渐变色</option>
+						<option value="#790303">暗红色</option>
+					</select>
+					<div class="color-preview" id="colorPreview"></div>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">您还有条目没有选择或填写！</div>
+		</script>
+		<script id="pop-content-tpl-11" type="text/html">
+			<div class="other-item">
+				<div class="item-title">原图片文件大小{ori_file_size}KB，像素尺寸{ori_width_px}×{ori_height_px}px</div>
+			</div>
+			<div class="other-item">
+				<div class="item-title">
+					地区<span style="color: red;">*</span>
+				</div>
+				<div class="item-value">
+					<select class="prov-select required-input" id="provSelect" onchange="updateProv(this.value)">
+						<option value="">选择地区</option>
+					</select>
+				</div>
+			</div>
+			<div class="input-error-message" id="input-error-message">请填写所有必填项！</div>
+		</script>
+		
+		
+		<script>
+			// 调用后端处理照片
+			function http_create_order(reqParams){
+				return new Promise((resolve, reject) => {
+					http_post({url:getProtocol()+'//www.xiexinbao.com/csj_order/add',data:reqParams,callback:function(result){
+						resultObject = JSON.parse(result); 
+						resolve(resultObject.status);
+					}})
+				});
+			};
+			
+			// 后端智能判断
+			function add_detect_task(image_url){
+				return new Promise((resolve, reject) => {
+					http_post({url:getProtocol()+'//koutu.xiexinbao.com/common/api?type=csj_detect_idphpto',data:{ori_image_url:image_url},callback:function(result){
+						resolve(result);
+					}})
+				});
+			};
+			
+			
+			// std识别文字
+			function add_std_task(image_url){
+				return new Promise((resolve, reject) => {
+					http_post({url:getProtocol()+'//koutu.xiexinbao.com/common/api?type=csj_std_detect',data:{ori_image_url:image_url},callback:function(result){
+					console.log('Raw result:', result);
+					if (typeof result == 'number' || typeof result == 'string') {
+                        resolve(result);
+                    } else {
+                        resolve(0);
+                    }
+					}})
+				});
+			};
+			
+			
+			// 获取跳转微信客服的链接
+			function get_wx_service_link(order_id){
+				var req_params = {
+					kfid: 'kfcaf30e8ba222ae963',  
+					scene: order_id
+				};
+				return new Promise((resolve, reject) => {
+					http_post({url:getProtocol()+'//129.400.lv/wxchat/wf',data:req_params,callback:function(result){
+						var service_link_url = extractHttpLink(result);
+						resolve(service_link_url);
+					}})
+				});
+			};
+			
+			
+			
+			//var order_id = getId();
+			async function create_order(){
+				//var allValid = true;
+				//var file_size_input = document.querySelector('.file-size-input');
+				var inputErrorMessage = document.getElementById('input-error-message');
+				/*
+				if (file_size_input && inputErrorMessage && file_size_input.value.trim() == '') {
+					alert(inputErrorMessage.textContent);
+					return;
+				}
+				*/
+				var bgcolorSelect = document.getElementById('colorSelect');
+				if (bgcolorSelect && !bgcolorSelect.value.trim()) {
+					alert("请选择照片底色！");
+					return;
+				};
+				
+				const requiredInputs = document.querySelectorAll('input.required-input, select.required-input');
+				for (let input of requiredInputs) {
+					if (!input.value.trim() && inputErrorMessage) {
+						alert(inputErrorMessage.textContent);
+						return;
+					}
+				};
+				
+				
+				if (photo_params.do_id == 6000 && (photo_params.width_px > 2000 || photo_params.height_px > 2000)) {
+					alert("填写的像素尺寸不能大于2000px");
+					return;
+				};
+				if (photo_params.do_id == 6000 && (photo_params.width_px < 100 || photo_params.height_px < 100)) {
+					alert("填写的像素尺寸不能小于100px");
+					return;
+				};
+				if (photo_params.do_id == 6000 && (photo_params.width_px > photo_params.height_px)) {
+					alert("您的像素宽、高填反啦！");
+					return;
+				};
+				
+				if ('file_size' in photo_params && (photo_params.file_size < 6 || photo_params.file_size > 2000)) {
+					alert("填写的文件大小超出范围：6~2000kb");
+					return;
+				};
+				
+				//admin_uid ='demo';
+				popToast({title:'正在制作中',icon:'loading',timeout:2000});
+				console.log(window.location.hostname);
+				var user_id = getUserId();
+				if (admin_uid == 'demo') {
+					user_id = admin_uid;
+				};
+				
+				var data_in = {
+					'jump_kefu': photo_params.jump_kefu,
+					'admin_uid': admin_uid,
+					'do_id': photo_params.do_id,
+					'item_id': photo_params.item_id,
+					'item_name': photo_params.name,
+					'ori_file_size': photo_params.ori_file_size,
+					'ori_width_px': photo_params.ori_width_px,
+					'ori_height_px': photo_params.ori_height_px,
+					'bg_color': photo_params.color,
+					'ori_img_url': photo_params.ori_img_url,
+					'width_px': photo_params.width_px,
+					'height_px': photo_params.height_px,
+					'dpi': photo_params.dpi,
+					'file_size': photo_params.file_size,
+					'beauty': photo_params.beauty,
+				};
+				if (photo_params.item_id >= 1000 && photo_params.item_id < 1500) {
+					data_in.review = photo_params.review;
+				};
+				
+				if (photo_params.do_id == 1) {
+					data_in = {
+					'jump_kefu': photo_params.jump_kefu,
+					'admin_uid': admin_uid,
+					'do_id': photo_params.do_id,
+					'item_id': photo_params.item_id,
+					'item_name': photo_params.name,
+					'ori_file_size': photo_params.ori_file_size,
+					'ori_width_px': photo_params.ori_width_px,
+					'ori_height_px': photo_params.ori_height_px,
+					'ori_img_url': photo_params.ori_img_url,
+					'file_size': photo_params.file_size,
+					'scale_factor': photo_params.scale_factor,
+					'beauty': photo_params.beauty,
+					};
+				} else if (photo_params.do_id == 2) {
+					data_in = {
+					'jump_kefu': photo_params.jump_kefu,
+					'admin_uid': admin_uid,
+					'do_id': photo_params.do_id,
+					'item_id': photo_params.item_id,
+					'item_name': photo_params.name,
+					'ori_file_size': photo_params.ori_file_size,
+					'ori_width_px': photo_params.ori_width_px,
+					'ori_height_px': photo_params.ori_height_px,
+					'ori_img_url': photo_params.ori_img_url,
+					'ori_file_format': photo_params.ori_file_format,
+					'file_format': photo_params.file_format,
+					'file_size': photo_params.file_size,
+					};
+				} else if (photo_params.do_id == 3) {
+					data_in = {
+					'jump_kefu': photo_params.jump_kefu,
+					'admin_uid': admin_uid,
+					'do_id': photo_params.do_id,
+					'item_id': photo_params.item_id,
+					'item_name': photo_params.name,
+					'ori_file_size': photo_params.ori_file_size,
+					'ori_width_px': photo_params.ori_width_px,
+					'ori_height_px': photo_params.ori_height_px,
+					'ori_img_url': photo_params.ori_img_url,
+					'ori_file_format': photo_params.ori_file_format,
+					'width_px': photo_params.width_px,
+					'height_px': photo_params.height_px,
+					'dpi': photo_params.dpi,
+					'bg_color': photo_params.color,
+					'paper_size': photo_params.paper_size,
+					};
+				}
+				
+				var price = 3.9;
+				if ("price" in photo_params) {
+					price = photo_params.price;
+				};
+
+				if (photo_params.item_id == 1 && photo_params.do_id == 6000) {
+					price = 9.9;
+				};
+				
+				if (admin_uid == 'admin') {
+					price = 0.01;
+				};
+				
+				
+				var order_result_page = `csj_order_result.html?id=${photo_params.order_id}`;
+				if ('order_result_id' in photo_params && photo_params.order_result_id > 0) {
+					order_result_page = `csj_order_result${photo_params.order_result_id}.html?id=${photo_params.order_id}`;
+					if (admin_uid == 'desss') {
+						order_result_page = `csj_order_result${photo_params.order_result_id}_test.html?id=${photo_params.order_id}`;
+					};
+				};
+				var pay_callback = getProtocol()+'//'+window.location.host+'/'+order_result_page+'&pay_ok=1'+`&user_id=${user_id}`;
+				
+				if (!('flag' in photo_params)) {
+					photo_params.flag = '';
+				};
+				var order_req_params = {
+					'id': photo_params.order_id,
+					'item_id': photo_params.item_id,
+					'item_name': photo_params.name+photo_params.flag,
+					'wx_nick': "",
+					'wx_avatar': "",
+					'user_id': user_id,
+					'ua': getOS()+'_' +getBrowser(),
+					'price': price,
+					"data_in": data_in,
+					'track': window.location.host,
+					'pay_callback': pay_callback,
+				};
+				
+				
+				var order_status = await http_create_order(order_req_params);
+				if ('order_result_id' in photo_params && photo_params.order_result_id > 0) {
+					if (admin_uid == 'desss') {
+						window.location.href = `csj_order_result${photo_params.order_result_id}_test.html?id=${photo_params.order_id}`;
+					};
+					window.location.href = `csj_order_result${photo_params.order_result_id}.html?id=${photo_params.order_id}`;
+				} else {
+					window.location.href = `csj_order_result.html?id=${photo_params.order_id}`;
+				}
+				
+			};
+			
+			
+			function renderPopInfo(tpl, photoParams) {
+				// 增加弹窗class
+				var popDiv1 = document.querySelector(".pop-info");
+				if (popDiv1) {
+					popDiv1.classList.add('pop-info-show');
+				}
+				
+				// name
+				var nameDiv = document.querySelector(".pop-info-content-photo .content-head-photo .name");
+				if (nameDiv) {
+					nameDiv.innerHTML=data_name;
+				}
+				var dataHtml = getHtmlByTpl(tpl, photoParams);
+				document.getElementById('contentMid').innerHTML = dataHtml;
+			}
+			
+			function getHtmlByTpl(tpl_id, data){
+				var html = document.getElementById(tpl_id).innerHTML;
+				var keys = Object.keys(data);
+				for(var j=0;j<keys.length;j++){
+					var key = keys[j];
+					html = html.replaceAll('{'+key+'}', data[key]);
+				};
+				return html;
+			}
+			
+			function updateColorPreview(color){
+				const preview = document.getElementById('colorPreview');
+				// 处理渐变颜色
+				if (color == "grad_blue_white") {
+					preview.style.background = "linear-gradient(to bottom, #3492C4, #FFFFFF)";
+				} else {
+					preview.style.background = "none";
+					preview.style.backgroundColor = color;
+				}
+				photo_params.color = color_map[color];
+			};
+			
+			// 更新dpi值，随着根据照片尺寸更新宽高值
+			function updateDpiDisplay(dpi_idx){
+				var dpi = dpi_values[dpi_idx];
+				document.getElementById('dpiDisplay').textContent = dpi;
+				photo_params.dpi = dpi;
+			};
+			
+			function updateBeauty(value) {
+				photo_params.beauty = parseInt(value);
+			};
+			
+			function updateFormat(value) {
+				photo_params.file_format = value;
+			};
+			
+			function updatePixelV1(value) {
+				const match = value.match(/(\d+)[*×](\d+)/);
+				if (match) {
+					photo_params.width_px = parseInt(match[1]);
+					photo_params.height_px = parseInt(match[2]);
+				};
+			};
+			
+			function updateProv(value) {
+				if (value.trim()) {
+					var [prov, md] = value.split(',');
+					var md_info = md_map[md];
+					var [width_px, height_px, dpi, bg_color, file_size, review_type] = md_info.split(',');
+					photo_params.width_px = parseInt(width_px);
+					photo_params.height_px = parseInt(height_px);
+					photo_params.dpi = parseInt(dpi);
+					photo_params.color = bg_color;
+					photo_params.file_size = parseInt(file_size);
+					photo_params.review = review_type;
+					photo_params.name = prov+data_name;
+				} else {
+					photo_params.width_px = 0;
+					photo_params.height_px = 0;
+				};
+				//console.log(photo_params);
+			};
+			
+			// 更新文件大小：展示和参数
+			function updateFileSizeDisplay(fileSize){
+				document.getElementById('fileSizeDisplay').textContent = `${fileSize}KB左右`;
+				photo_params.file_size = Number(fileSize);
+			};
+			
+			// 更新文件大小参数
+			function updateFileSize(fileSize){
+				photo_params.file_size = parseInt(fileSize, 10);
+			};
+			
+			function updatePixelWidth(width_px){
+				photo_params.width_px = parseInt(width_px, 10);
+			};
+			function updatePixelHeight(height_px){
+				photo_params.height_px = parseInt(height_px, 10);
+			};
+			
+			function updatePixelScale(scale) {
+				photo_params.scale_factor = Number(scale);
+				var width_px = parseInt(photo_params.scale_factor * photo_params.ori_width_px);
+				var height_px = parseInt(photo_params.scale_factor * photo_params.ori_height_px);
+				document.getElementById('pixelScaleDisplay').textContent = `${width_px}×${height_px}px`;
+			};
+			
+			// 给父div添加点击事件
+			var popInfoDiv2 = document.getElementById('popInfo');
+			popInfoDiv2.addEventListener('click', function(event) {
+				// 检查点击的是否是父div（即阴影部分）
+				if (event.target === popInfoDiv2) {
+					// 隐藏弹窗
+					popInfoDiv2.classList.remove('pop-info-show');
+				}
+			});
+				
+			function popInfoHidden() {
+				// 不展示
+				var popDiv1 = document.querySelector(".pop-info");
+				if (popDiv1) {
+					popDiv1.classList.remove('pop-info-show');
+				}
+			}
+		</script>
+	</div>
+<script>
+(function() {
+	var cswtj_id = '';
+	var _plat = window.location.hostname;
+	var _w = window.hasOwnProperty('w')? window.hasOwnProperty('w'): '';
+	if (typeof localStorage == "object") {cswtj_id = localStorage.getItem('cswtj_id') || ''; }
+	function _loadtj(retries) {
+		var hm = document.createElement("script");
+		hm.src = getProtocol()+"//log.xiexinbao.com/cswtj.js?plat="+_plat+"&w="+_w+"&cswtj_id="+cswtj_id;
+		hm.onload = function() {};
+		hm.onerror = function() {if (retries > 0) {_loadtj(retries - 1);}console.log('cswtj.js load error!')};
+		var s = document.getElementsByTagName("script")[0]; 
+		s.parentNode.insertBefore(hm, s);
+	}
+	_loadtj(1);
+})();
+</script>
+
+<input type="file" accept="image/*" style="display: none;" id="tmp_file_window"></body></html>
