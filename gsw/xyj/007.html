@@ -1,6 +1,8 @@
 <html>
  <head>
   <meta charset="utf-8"/>
+  <script src="jquery-2.0.1.min.js">
+  </script>
  </head>
  <body>
   <button onclick="speak()">
@@ -191,10 +193,9 @@
  <script>
   function speak() {
         var text = "";
-        pps = document.getElementsByTagName("p");
-        for (var i = 0; i < pps.length; i++) {
-            text += pps[i].textContent.trim() + "\n";
-        }
+        $('p').each(function() {
+            text += $(this).text().trim() + "\n"
+        });
         // 使用Web Speech API
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'zh-CN'; // 设置为中文
