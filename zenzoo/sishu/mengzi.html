@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>孟子 · 四書 · 中華經典古籍</title>
+<link rel="stylesheet" href="../classic.css" />
+<style>
+  .intro { line-height: 2; text-indent: 2em; color: var(--color-text); font-size: 1.02rem; margin-bottom: 1.5rem; }
+  .juan-block { margin-bottom: 2rem; }
+  .juan-title { font-size: 1.15rem; color: var(--color-red); border-left: 4px solid var(--color-gold); padding-left: 0.7rem; margin: 1.2rem 0 0.6rem; }
+  .pian-list { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .pian-item { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.5rem 0.8rem; border: 1px solid var(--color-border); border-radius: 6px; transition: all 0.2s; text-decoration: none; color: var(--color-text); }
+  .pian-item:hover { border-color: var(--color-red); background: #fff; }
+  .pian-num { flex-shrink: 0; width: 1.5rem; text-align: center; color: var(--color-gold); font-weight: 700; font-size: 0.95rem; }
+  .pian-name { font-weight: 700; font-size: 1rem; white-space: nowrap; }
+  .pian-desc { color: var(--color-light); font-size: 0.88rem; margin-left: auto; }
+  .pian-tag { flex-shrink: 0; font-size: 0.75rem; padding: 0.1rem 0.4rem; border-radius: 3px; background: #eee; color: #999; }
+  .pian-tag.done { background: #f0e6d0; color: var(--color-gold); }
+  .nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin: 1.5rem 0; }
+  .nav-item { display: block; padding: 0.5rem 0.8rem; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 6px; text-align: center; color: var(--color-text); text-decoration: none; font-size: 0.92rem; transition: all 0.2s; }
+  .nav-item:hover { border-color: var(--color-red); color: var(--color-red); background: #fff; }
+  .back-top { position: fixed; bottom: 2rem; right: 2rem; width: 44px; height: 44px; border-radius: 50%; background: var(--color-red); color: #fff; border: none; font-size: 1.3rem; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.18); z-index: 100; }
+  .back-top.show { display: flex; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <nav class="site-nav">
+    <a href="../index.html">📖 中華經典古籍</a>
+    <span class="nav-sep">/</span>
+    <a href="../index.html#sishu">四書</a>
+    <span class="nav-sep">/</span>
+    <span>孟子</span>
+  </nav>
+</header>
+
+<main class="text-page">
+  <h1 class="text-title">孟子</h1>
+  <p class="text-subtitle">四書之二 · 戰國 · 孟軻著 · 趙岐注</p>
+
+  <p class="intro">
+    《孟子》為戰國時期儒家大師孟軻（孟子）及其弟子萬章等所著，共七篇，每篇分上、下，凡十四章，三萬五千餘字。孟子繼承並發揚孔子學說，提出「性善論」「仁政」「王道」「民貴君輕」等重要思想，與孔子並稱「孔孟」，為儒家第二聖人。南宋朱熹將其與《論語》《大學》《中庸》合為「四書」，成為科舉必讀之典。
+  </p>
+
+  <!-- 四書导航 -->
+  <nav class="nav-grid">
+    <a class="nav-item" href="lunyu.html">論語</a>
+    <a class="nav-item" style="border-color:var(--color-red);color:var(--color-red);font-weight:700;" href="mengzi.html">孟子</a>
+    <a class="nav-item" href="daxue.html">大學</a>
+    <a class="nav-item" href="zhongyong.html">中庸</a>
+  </nav>
+
+  <!-- 第一篇：梁惠王 -->
+  <div class="juan-block">
+    <h2 class="juan-title">第一篇 · 梁惠王</h2>
+    <ul class="pian-list">
+      <li><a class="pian-item" href="mengzi/lianghuiwang_shang.html">
+        <span class="pian-num">壹</span>
+        <span class="pian-name">梁惠王上</span>
+        <span class="pian-desc">「義利之辨」「王何必曰利」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+      <li><a class="pian-item" href="mengzi/lianghuiwang_xia.html">
+        <span class="pian-num">貳</span>
+        <span class="pian-name">梁惠王下</span>
+        <span class="pian-desc">「與民同樂」「寡人之於國也」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <!-- 第二篇：公孫丑 -->
+  <div class="juan-block">
+    <h2 class="juan-title">第二篇 · 公孫丑</h2>
+    <ul class="pian-list">
+      <li><a class="pian-item" href="mengzi/gongsunchou_shang.html">
+        <span class="pian-num">叁</span>
+        <span class="pian-name">公孫丑上</span>
+        <span class="pian-desc">「吾善養吾浩然之氣」「知言養氣」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+      <li><a class="pian-item" href="mengzi/gongsunchou_xia.html">
+        <span class="pian-num">肆</span>
+        <span class="pian-name">公孫丑下</span>
+        <span class="pian-desc">「天時不如地利，地利不如人和」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <!-- 第三篇：滕文公 -->
+  <div class="juan-block">
+    <h2 class="juan-title">第三篇 · 滕文公</h2>
+    <ul class="pian-list">
+      <li><a class="pian-item" href="mengzi/tengwengong_shang.html">
+        <span class="pian-num">伍</span>
+        <span class="pian-name">滕文公上</span>
+        <span class="pian-desc">「性善論」「道性善，言必稱堯舜」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+      <li><a class="pian-item" href="mengzi/tengwengong_xia.html">
+        <span class="pian-num">陸</span>
+        <span class="pian-name">滕文公下</span>
+        <span class="pian-desc">「富贵不能淫，貧賤不能移，威武不能屈」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <!-- 第四篇：離婁 -->
+  <div class="juan-block">
+    <h2 class="juan-title">第四篇 · 離婁</h2>
+    <ul class="pian-list">
+      <li><a class="pian-item" href="mengzi/lilou_shang.html">
+        <span class="pian-num">柒</span>
+        <span class="pian-name">離婁上</span>
+        <span class="pian-desc">「不以規矩，不能成方圓」「徒善不足以為政」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+      <li><a class="pian-item" href="mengzi/lilou_xia.html">
+        <span class="pian-num">捌</span>
+        <span class="pian-name">離婁下</span>
+        <span class="pian-desc">「君之視臣如手足，則臣視君如腹心」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <!-- 第五篇：萬章 -->
+  <div class="juan-block">
+    <h2 class="juan-title">第五篇 · 萬章</h2>
+    <ul class="pian-list">
+      <li><a class="pian-item" href="mengzi/wanzhang_shang.html">
+        <span class="pian-num">玖</span>
+        <span class="pian-name">萬章上</span>
+        <span class="pian-desc">問堯舜禪讓、禹傳子之義，辨天命民心</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+      <li><a class="pian-item" href="mengzi/wanzhang_xia.html">
+        <span class="pian-num">拾</span>
+        <span class="pian-name">萬章下</span>
+        <span class="pian-desc">論孔子之集大成、伯夷伊尹柳下惠</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <!-- 第六篇：告子 -->
+  <div class="juan-block">
+    <h2 class="juan-title">第六篇 · 告子</h2>
+    <ul class="pian-list">
+      <li><a class="pian-item" href="mengzi/gaozi_shang.html">
+        <span class="pian-num">拾壹</span>
+        <span class="pian-name">告子上</span>
+        <span class="pian-desc">「性善論」詳辯，牛山之木、水信無分於東西</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+      <li><a class="pian-item" href="mengzi/gaozi_xia.html">
+        <span class="pian-num">拾貳</span>
+        <span class="pian-name">告子下</span>
+        <span class="pian-desc">「生於憂患，死於安樂」「天將降大任於是人也」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <!-- 第七篇：盡心 -->
+  <div class="juan-block">
+    <h2 class="juan-title">第七篇 · 盡心</h2>
+    <ul class="pian-list">
+      <li><a class="pian-item" href="mengzi/jinxin_shang.html">
+        <span class="pian-num">拾叁</span>
+        <span class="pian-name">盡心上</span>
+        <span class="pian-desc">「盡其心者，知其性也」「民為貴，社稷次之，君為輕」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+      <li><a class="pian-item" href="mengzi/jinxin_xia.html">
+        <span class="pian-num">拾肆</span>
+        <span class="pian-name">盡心下</span>
+        <span class="pian-desc">「可欲之謂善」「春秋無義戰」「盡信書不如無書」</span>
+        <span class="pian-tag">整理中</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <p style="text-align:center;color:var(--color-light);margin-top:2rem;">—— 孟子七篇十四章 目錄終 ——</p>
+</main>
+
+<footer class="site-footer">
+  <p>中華經典古籍數字檔案 · 四書 · 孟子</p>
+  <p><a href="../index.html">返回索引</a> · <a href="#sec-sishu">四書</a></p>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+const btn = document.getElementById('backTop');
+window.addEventListener('scroll', () => { btn.classList.toggle('show', window.scrollY > 300); });
+</script>
+</body>
+</html>

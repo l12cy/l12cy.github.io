@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>周易上經 — 中華經典古籍數字檔案</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../classic.css" />
+  <style>
+    /* 周易专用补充样式 */
+    .gua-block {
+      margin: 2.2rem 0;
+      border: 1px solid var(--color-border-light);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .gua-header {
+      background: linear-gradient(90deg, #2c1a0e 0%, #4a2c14 100%);
+      color: #f5e6c8;
+      padding: .65rem 1.1rem;
+      display: flex;
+      align-items: baseline;
+      gap: .8rem;
+      flex-wrap: wrap;
+    }
+    .gua-header .gua-num {
+      font-size: .78rem;
+      color: var(--color-gold);
+      letter-spacing: .1em;
+      flex-shrink: 0;
+    }
+    .gua-header .gua-name {
+      font-family: var(--font-kai);
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: .25em;
+    }
+    .gua-header .gua-symbol {
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+    .gua-header .gua-upper-lower {
+      font-size: .8rem;
+      color: #c8a870;
+      margin-left: auto;
+      letter-spacing: .08em;
+    }
+    .gua-body {
+      padding: 1rem 1.2rem 1.2rem;
+    }
+    .gua-ci {
+      font-family: var(--font-kai);
+      font-size: 1rem;
+      color: var(--color-ink);
+      line-height: 2;
+      margin-bottom: .3rem;
+    }
+    .gua-ci .label {
+      color: var(--color-red);
+      font-weight: 700;
+      margin-right: .3em;
+      font-size: .92rem;
+    }
+    .gua-ci .yao-label {
+      color: var(--color-gold);
+      font-weight: 700;
+      margin-right: .3em;
+      font-size: .88rem;
+    }
+    .divider-yao {
+      border: none;
+      border-top: 1px dashed var(--color-border-light);
+      margin: .4rem 0;
+    }
+    /* 导航栏 */
+    .page-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .8rem 0;
+      margin-bottom: 1.2rem;
+      border-bottom: 1px solid var(--color-border-light);
+      font-size: .88rem;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+    .page-nav a {
+      color: var(--color-ink-light);
+      text-decoration: none;
+      padding: .25rem .6rem;
+      border: 1px solid var(--color-border-light);
+      border-radius: 3px;
+      transition: all .2s;
+    }
+    .page-nav a:hover {
+      background: var(--color-red);
+      color: #fff;
+      border-color: var(--color-red);
+    }
+    /* 目录快跳 */
+    .toc {
+      background: #fdf4e3;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 2rem;
+      column-count: 5;
+      column-gap: .5rem;
+    }
+    @media (max-width: 600px) { .toc { column-count: 3; } }
+    .toc a {
+      display: block;
+      font-family: var(--font-kai);
+      font-size: .9rem;
+      color: var(--color-ink-light);
+      text-decoration: none;
+      line-height: 1.8;
+      letter-spacing: .06em;
+    }
+    .toc a:hover { color: var(--color-red); }
+    .toc-title {
+      column-span: all;
+      font-family: var(--font-kai);
+      font-size: .95rem;
+      color: var(--color-gold);
+      letter-spacing: .15em;
+      margin-bottom: .5rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1 class="site-title">周易上經</h1>
+  <p class="site-subtitle">乾一 ～ 離三十　　六十四卦之上半</p>
+</header>
+
+<main class="text-page">
+
+  <nav class="page-nav">
+    <a href="../index.html">← 總目</a>
+    <span style="color:var(--color-ink-faint);font-family:var(--font-kai);letter-spacing:.1em;">周易上經 · 卦一至卦三十</span>
+    <a href="xiajing.html">下經 →</a>
+  </nav>
+
+  <!-- 目录 -->
+  <div class="toc">
+    <div class="toc-title">卦目快覽</div>
+    <a href="#g01">一·乾</a><a href="#g02">二·坤</a><a href="#g03">三·屯</a>
+    <a href="#g04">四·蒙</a><a href="#g05">五·需</a><a href="#g06">六·訟</a>
+    <a href="#g07">七·師</a><a href="#g08">八·比</a><a href="#g09">九·小畜</a>
+    <a href="#g10">十·履</a><a href="#g11">十一·泰</a><a href="#g12">十二·否</a>
+    <a href="#g13">十三·同人</a><a href="#g14">十四·大有</a><a href="#g15">十五·謙</a>
+    <a href="#g16">十六·豫</a><a href="#g17">十七·隨</a><a href="#g18">十八·蠱</a>
+    <a href="#g19">十九·臨</a><a href="#g20">二十·觀</a><a href="#g21">廿一·噬嗑</a>
+    <a href="#g22">廿二·賁</a><a href="#g23">廿三·剝</a><a href="#g24">廿四·復</a>
+    <a href="#g25">廿五·无妄</a><a href="#g26">廿六·大畜</a><a href="#g27">廿七·頤</a>
+    <a href="#g28">廿八·大過</a><a href="#g29">廿九·坎</a><a href="#g30">三十·離</a>
+  </div>
+
+  <!-- ===== 卦 01 乾 ===== -->
+  <div class="gua-block" id="g01">
+    <div class="gua-header">
+      <span class="gua-num">第一卦</span>
+      <span class="gua-symbol">䷀</span>
+      <span class="gua-name">乾</span>
+      <span class="gua-upper-lower">上乾☰ 下乾☰</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>乾：元，亨，利，貞。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>潛龍，勿用。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>見龍在田，利見大人。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>君子終日乾乾，夕惕若，厲，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>或躍在淵，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>飛龍在天，利見大人。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>亢龍，有悔。</p>
+      <p class="gua-ci"><span class="yao-label">用九</span>見群龍无首，吉。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 02 坤 ===== -->
+  <div class="gua-block" id="g02">
+    <div class="gua-header">
+      <span class="gua-num">第二卦</span>
+      <span class="gua-symbol">䷁</span>
+      <span class="gua-name">坤</span>
+      <span class="gua-upper-lower">上坤☷ 下坤☷</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>坤：元，亨，利牝馬之貞。君子有攸往，先迷後得主，利。西南得朋，東北喪朋。安貞，吉。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>履霜，堅冰至。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>直，方，大，不習，无不利。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>含章，可貞。或從王事，无成有終。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>括囊，无咎，无譽。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>黃裳，元吉。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>龍戰于野，其血玄黃。</p>
+      <p class="gua-ci"><span class="yao-label">用六</span>利永貞。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 03 屯 ===== -->
+  <div class="gua-block" id="g03">
+    <div class="gua-header">
+      <span class="gua-num">第三卦</span>
+      <span class="gua-symbol">䷂</span>
+      <span class="gua-name">屯</span>
+      <span class="gua-upper-lower">上坎☵ 下震☳</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>屯：元亨，利貞。勿用有攸往，利建侯。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>磐桓，利居貞，利建侯。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>屯如，邅如，乘馬班如。匪寇，婚媾。女子貞不字，十年乃字。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>即鹿无虞，惟入于林中。君子幾，不如舍，往吝。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>乘馬班如，求婚媾，往吉，无不利。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>屯其膏，小貞吉，大貞凶。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>乘馬班如，泣血漣如。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 04 蒙 ===== -->
+  <div class="gua-block" id="g04">
+    <div class="gua-header">
+      <span class="gua-num">第四卦</span>
+      <span class="gua-symbol">䷃</span>
+      <span class="gua-name">蒙</span>
+      <span class="gua-upper-lower">上艮☶ 下坎☵</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>蒙：亨。匪我求童蒙，童蒙求我。初筮告，再三瀆，瀆則不告。利貞。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>發蒙，利用刑人，用說桎梏，以往吝。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>包蒙，吉。納婦，吉。子克家。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>勿用取女，見金夫，不有躬，无攸利。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>困蒙，吝。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>童蒙，吉。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>擊蒙，不利為寇，利禦寇。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 05 需 ===== -->
+  <div class="gua-block" id="g05">
+    <div class="gua-header">
+      <span class="gua-num">第五卦</span>
+      <span class="gua-symbol">䷄</span>
+      <span class="gua-name">需</span>
+      <span class="gua-upper-lower">上坎☵ 下乾☰</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>需：有孚，光亨，貞吉。利涉大川。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>需于郊，利用恒，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>需于沙，小有言，終吉。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>需于泥，致寇至。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>需于血，出自穴。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>需于酒食，貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>入于穴，有不速之客三人來，敬之終吉。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 06 訟 ===== -->
+  <div class="gua-block" id="g06">
+    <div class="gua-header">
+      <span class="gua-num">第六卦</span>
+      <span class="gua-symbol">䷅</span>
+      <span class="gua-name">訟</span>
+      <span class="gua-upper-lower">上乾☰ 下坎☵</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>訟：有孚，窒惕，中吉，終凶。利見大人，不利涉大川。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>不永所事，小有言，終吉。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>不克訟，歸而逋，其邑人三百戶，无眚。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>食舊德，貞厲，終吉。或從王事，无成。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>不克訟，復即命，渝，安貞，吉。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>訟，元吉。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>或錫之鞶帶，終朝三褫之。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 07 師 ===== -->
+  <div class="gua-block" id="g07">
+    <div class="gua-header">
+      <span class="gua-num">第七卦</span>
+      <span class="gua-symbol">䷆</span>
+      <span class="gua-name">師</span>
+      <span class="gua-upper-lower">上坤☷ 下坎☵</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>師：貞，丈人吉，无咎。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>師出以律，否臧，凶。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>在師中，吉，无咎，王三錫命。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>師或輿尸，凶。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>師左次，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>田有禽，利執言，无咎。長子帥師，弟子輿尸，貞凶。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>大君有命，開國承家，小人勿用。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 08 比 ===== -->
+  <div class="gua-block" id="g08">
+    <div class="gua-header">
+      <span class="gua-num">第八卦</span>
+      <span class="gua-symbol">䷇</span>
+      <span class="gua-name">比</span>
+      <span class="gua-upper-lower">上坎☵ 下坤☷</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>比：吉。原筮，元永貞，无咎。不寧方來，後夫凶。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>有孚比之，无咎。有孚盈缶，終來有它，吉。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>比之自內，貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>比之匪人。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>外比之，貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>顯比，王用三驅，失前禽。邑人不誡，吉。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>比之无首，凶。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 09 小畜 ===== -->
+  <div class="gua-block" id="g09">
+    <div class="gua-header">
+      <span class="gua-num">第九卦</span>
+      <span class="gua-symbol">䷈</span>
+      <span class="gua-name">小畜</span>
+      <span class="gua-upper-lower">上巽☴ 下乾☰</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>小畜：亨。密雲不雨，自我西郊。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>復自道，何其咎，吉。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>牽復，吉。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>輿說輻，夫妻反目。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>有孚，血去惕出，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>有孚攣如，富以其鄰。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>既雨既處，尚德載，婦貞厲。月幾望，君子征凶。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 10 履 ===== -->
+  <div class="gua-block" id="g10">
+    <div class="gua-header">
+      <span class="gua-num">第十卦</span>
+      <span class="gua-symbol">䷉</span>
+      <span class="gua-name">履</span>
+      <span class="gua-upper-lower">上乾☰ 下兌☱</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>履：履虎尾，不咥人，亨。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>素履，往，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>履道坦坦，幽人貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>眇能視，跛能履，履虎尾，咥人，凶。武人為于大君。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>履虎尾，愬愬，終吉。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>夬履，貞厲。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>視履考祥，其旋元吉。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 11 泰 ===== -->
+  <div class="gua-block" id="g11">
+    <div class="gua-header">
+      <span class="gua-num">第十一卦</span>
+      <span class="gua-symbol">䷊</span>
+      <span class="gua-name">泰</span>
+      <span class="gua-upper-lower">上坤☷ 下乾☰</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>泰：小往大來，吉，亨。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>拔茅茹，以其彙，征吉。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>包荒，用馮河，不遐遺，朋亡，得尚于中行。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>无平不陂，无往不復。艱貞，无咎。勿恤其孚，于食有福。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>翩翩，不富以其鄰，不戒以孚。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>帝乙歸妹，以祉元吉。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>城復于隍，勿用師。自邑告命，貞吝。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 12 否 ===== -->
+  <div class="gua-block" id="g12">
+    <div class="gua-header">
+      <span class="gua-num">第十二卦</span>
+      <span class="gua-symbol">䷋</span>
+      <span class="gua-name">否</span>
+      <span class="gua-upper-lower">上乾☰ 下坤☷</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>否之匪人，不利君子貞，大往小來。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>拔茅茹，以其彙，貞吉，亨。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>包承，小人吉，大人否，亨。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>包羞。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>有命，无咎，疇離祉。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>休否，大人吉。其亡其亡，繫于苞桑。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>傾否，先否後喜。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 13 同人 ===== -->
+  <div class="gua-block" id="g13">
+    <div class="gua-header">
+      <span class="gua-num">第十三卦</span>
+      <span class="gua-symbol">䷌</span>
+      <span class="gua-name">同人</span>
+      <span class="gua-upper-lower">上乾☰ 下離☲</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>同人：同人于野，亨。利涉大川，利君子貞。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>同人于門，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>同人于宗，吝。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>伏戎于莽，升其高陵，三歲不興。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>乘其墉，弗克攻，吉。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>同人，先號咷而後笑，大師克，相遇。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>同人于郊，无悔。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 14 大有 ===== -->
+  <div class="gua-block" id="g14">
+    <div class="gua-header">
+      <span class="gua-num">第十四卦</span>
+      <span class="gua-symbol">䷍</span>
+      <span class="gua-name">大有</span>
+      <span class="gua-upper-lower">上離☲ 下乾☰</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>大有：元亨。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>无交害，匪咎，艱則无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>大車以載，有攸往，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>公用亨于天子，小人弗克。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>匪其彭，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>厥孚交如，威如，吉。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>自天祐之，吉无不利。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 15 謙 ===== -->
+  <div class="gua-block" id="g15">
+    <div class="gua-header">
+      <span class="gua-num">第十五卦</span>
+      <span class="gua-symbol">䷎</span>
+      <span class="gua-name">謙</span>
+      <span class="gua-upper-lower">上坤☷ 下艮☶</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>謙：亨，君子有終。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>謙謙君子，用涉大川，吉。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>鳴謙，貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>勞謙，君子有終，吉。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>无不利，撝謙。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>不富以其鄰，利用侵伐，无不利。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>鳴謙，利用行師，征邑國。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 16 豫 ===== -->
+  <div class="gua-block" id="g16">
+    <div class="gua-header">
+      <span class="gua-num">第十六卦</span>
+      <span class="gua-symbol">䷏</span>
+      <span class="gua-name">豫</span>
+      <span class="gua-upper-lower">上震☳ 下坤☷</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>豫：利建侯行師。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>鳴豫，凶。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>介于石，不終日，貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>盱豫，悔，遲有悔。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>由豫，大有得，勿疑，朋盍簪。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>貞疾，恒不死。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>冥豫，成有渝，无咎。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 17 隨 ===== -->
+  <div class="gua-block" id="g17">
+    <div class="gua-header">
+      <span class="gua-num">第十七卦</span>
+      <span class="gua-symbol">䷐</span>
+      <span class="gua-name">隨</span>
+      <span class="gua-upper-lower">上兌☱ 下震☳</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>隨：元亨，利貞，无咎。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>官有渝，貞吉，出門交有功。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>係小子，失丈夫。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>係丈夫，失小子。隨有求得，利居貞。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>隨有獲，貞凶。有孚在道，以明，何咎。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>孚于嘉，吉。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>拘係之，乃從維之，王用亨于西山。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 18 蠱 ===== -->
+  <div class="gua-block" id="g18">
+    <div class="gua-header">
+      <span class="gua-num">第十八卦</span>
+      <span class="gua-symbol">䷑</span>
+      <span class="gua-name">蠱</span>
+      <span class="gua-upper-lower">上艮☶ 下巽☴</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>蠱：元亨，利涉大川。先甲三日，後甲三日。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>幹父之蠱，有子，考无咎，厲終吉。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>幹母之蠱，不可貞。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>幹父之蠱，小有悔，无大咎。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>裕父之蠱，往見吝。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>幹父之蠱，用譽。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>不事王侯，高尚其事。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 19 臨 ===== -->
+  <div class="gua-block" id="g19">
+    <div class="gua-header">
+      <span class="gua-num">第十九卦</span>
+      <span class="gua-symbol">䷒</span>
+      <span class="gua-name">臨</span>
+      <span class="gua-upper-lower">上坤☷ 下兌☱</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>臨：元亨，利貞。至于八月有凶。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>咸臨，貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>咸臨，吉，无不利。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>甘臨，无攸利。既憂之，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>至臨，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>知臨，大君之宜，吉。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>敦臨，吉，无咎。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 20 觀 ===== -->
+  <div class="gua-block" id="g20">
+    <div class="gua-header">
+      <span class="gua-num">第二十卦</span>
+      <span class="gua-symbol">䷓</span>
+      <span class="gua-name">觀</span>
+      <span class="gua-upper-lower">上巽☴ 下坤☷</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>觀：盥而不薦，有孚顒若。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>童觀，小人无咎，君子吝。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>闚觀，利女貞。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>觀我生，進退。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>觀國之光，利用賓于王。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>觀我生，君子无咎。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>觀其生，君子无咎。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 21 噬嗑 ===== -->
+  <div class="gua-block" id="g21">
+    <div class="gua-header">
+      <span class="gua-num">第二十一卦</span>
+      <span class="gua-symbol">䷔</span>
+      <span class="gua-name">噬嗑</span>
+      <span class="gua-upper-lower">上離☲ 下震☳</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>噬嗑：亨。利用獄。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>屨校滅趾，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>噬膚滅鼻，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>噬腊肉，遇毒，小吝，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>噬乾胏，得金矢，利艱貞，吉。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>噬乾肉，得黃金，貞厲，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>何校滅耳，凶。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 22 賁 ===== -->
+  <div class="gua-block" id="g22">
+    <div class="gua-header">
+      <span class="gua-num">第二十二卦</span>
+      <span class="gua-symbol">䷕</span>
+      <span class="gua-name">賁</span>
+      <span class="gua-upper-lower">上艮☶ 下離☲</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>賁：亨。小利有攸往。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>賁其趾，舍車而徒。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>賁其須。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>賁如，濡如，永貞吉。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>賁如，皤如，白馬翰如，匪寇，婚媾。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>賁于丘園，束帛戔戔，吝，終吉。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>白賁，无咎。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 23 剝 ===== -->
+  <div class="gua-block" id="g23">
+    <div class="gua-header">
+      <span class="gua-num">第二十三卦</span>
+      <span class="gua-symbol">䷖</span>
+      <span class="gua-name">剝</span>
+      <span class="gua-upper-lower">上艮☶ 下坤☷</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>剝：不利有攸往。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>剝床以足，蔑，貞凶。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>剝床以辨，蔑，貞凶。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>剝之，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>剝床以膚，凶。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>貫魚，以宮人寵，无不利。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>碩果不食，君子得輿，小人剝廬。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 24 復 ===== -->
+  <div class="gua-block" id="g24">
+    <div class="gua-header">
+      <span class="gua-num">第二十四卦</span>
+      <span class="gua-symbol">䷗</span>
+      <span class="gua-name">復</span>
+      <span class="gua-upper-lower">上坤☷ 下震☳</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>復：亨。出入无疾，朋來无咎。反復其道，七日來復，利有攸往。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>不遠復，无祗悔，元吉。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>休復，吉。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>頻復，厲，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>中行獨復。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>敦復，无悔。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>迷復，凶，有災眚。用行師，終有大敗，以其國君凶，至于十年不克征。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 25 无妄 ===== -->
+  <div class="gua-block" id="g25">
+    <div class="gua-header">
+      <span class="gua-num">第二十五卦</span>
+      <span class="gua-symbol">䷘</span>
+      <span class="gua-name">无妄</span>
+      <span class="gua-upper-lower">上乾☰ 下震☳</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>无妄：元亨，利貞。其匪正有眚，不利有攸往。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>无妄，往吉。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>不耕穫，不菑畬，則利有攸往。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>无妄之災，或繫之牛，行人之得，邑人之災。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>可貞，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>无妄之疾，勿藥有喜。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>无妄，行有眚，无攸利。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 26 大畜 ===== -->
+  <div class="gua-block" id="g26">
+    <div class="gua-header">
+      <span class="gua-num">第二十六卦</span>
+      <span class="gua-symbol">䷙</span>
+      <span class="gua-name">大畜</span>
+      <span class="gua-upper-lower">上艮☶ 下乾☰</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>大畜：利貞，不家食吉，利涉大川。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>有厲，利已。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>輿說輹。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>良馬逐，利艱貞。曰閑輿衛，利有攸往。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>童牛之牿，元吉。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>豶豕之牙，吉。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>何天之衢，亨。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 27 頤 ===== -->
+  <div class="gua-block" id="g27">
+    <div class="gua-header">
+      <span class="gua-num">第二十七卦</span>
+      <span class="gua-symbol">䷚</span>
+      <span class="gua-name">頤</span>
+      <span class="gua-upper-lower">上艮☶ 下震☳</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>頤：貞吉。觀頤，自求口實。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>舍爾靈龜，觀我朵頤，凶。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>顛頤，拂經，于丘頤，征凶。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>拂頤，貞凶，十年勿用，无攸利。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>顛頤，吉。虎視眈眈，其欲逐逐，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>拂經，居貞吉，不可涉大川。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>由頤，厲，吉，利涉大川。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 28 大過 ===== -->
+  <div class="gua-block" id="g28">
+    <div class="gua-header">
+      <span class="gua-num">第二十八卦</span>
+      <span class="gua-symbol">䷛</span>
+      <span class="gua-name">大過</span>
+      <span class="gua-upper-lower">上兌☱ 下巽☴</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>大過：棟橈，利有攸往，亨。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>藉用白茅，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>枯楊生稊，老夫得其女妻，无不利。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>棟橈，凶。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>棟隆，吉。有它，吝。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>枯楊生華，老婦得其士夫，无咎无譽。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>過涉滅頂，凶，无咎。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 29 坎 ===== -->
+  <div class="gua-block" id="g29">
+    <div class="gua-header">
+      <span class="gua-num">第二十九卦</span>
+      <span class="gua-symbol">䷜</span>
+      <span class="gua-name">坎</span>
+      <span class="gua-upper-lower">上坎☵ 下坎☵</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>習坎：有孚，維心亨，行有尚。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初六</span>習坎，入于坎窞，凶。</p>
+      <p class="gua-ci"><span class="yao-label">九二</span>坎有險，求小得。</p>
+      <p class="gua-ci"><span class="yao-label">六三</span>來之坎坎，險且枕，入于坎窞，勿用。</p>
+      <p class="gua-ci"><span class="yao-label">六四</span>樽酒，簋貳，用缶，納約自牖，終无咎。</p>
+      <p class="gua-ci"><span class="yao-label">九五</span>坎不盈，祗既平，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">上六</span>係用徽纆，寘于叢棘，三歲不得，凶。</p>
+    </div>
+  </div>
+
+  <!-- ===== 卦 30 離 ===== -->
+  <div class="gua-block" id="g30">
+    <div class="gua-header">
+      <span class="gua-num">第三十卦</span>
+      <span class="gua-symbol">䷝</span>
+      <span class="gua-name">離</span>
+      <span class="gua-upper-lower">上離☲ 下離☲</span>
+    </div>
+    <div class="gua-body">
+      <p class="gua-ci"><span class="label">卦辭</span>離：利貞，亨。畜牝牛，吉。</p>
+      <hr class="divider-yao"/>
+      <p class="gua-ci"><span class="yao-label">初九</span>履錯然，敬之，无咎。</p>
+      <p class="gua-ci"><span class="yao-label">六二</span>黃離，元吉。</p>
+      <p class="gua-ci"><span class="yao-label">九三</span>日昃之離，不鼓缶而歌，則大耋之嗟，凶。</p>
+      <p class="gua-ci"><span class="yao-label">九四</span>突如其來如，焚如，死如，棄如。</p>
+      <p class="gua-ci"><span class="yao-label">六五</span>出涕沱若，戚嗟若，吉。</p>
+      <p class="gua-ci"><span class="yao-label">上九</span>王用出征，有嘉，折首，獲匪其醜，无咎。</p>
+    </div>
+  </div>
+
+  <div class="ornament-divider" aria-hidden="true">❦ 上經終 · 凡三十卦 ❦</div>
+
+  <nav class="page-nav" style="margin-top:1.5rem;">
+    <a href="../index.html">← 總目</a>
+    <a href="xiajing.html">下經（卦三十一至六十四）→</a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <p>中華經典古籍數字檔案 &nbsp;|&nbsp; 周易上經</p>
+</footer>
+
+<a href="#" class="back-top" id="backTop" title="回到頂部" aria-label="回到頂部">▲</a>
+<script>
+  const btn = document.getElementById('backTop');
+  window.addEventListener('scroll', () => { btn.classList.toggle('visible', window.scrollY > 300); });
+  btn.addEventListener('click', e => { e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); });
+</script>
+</body>
+</html>
