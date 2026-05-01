@@ -13,3 +13,5 @@ git remote add origin https://github.com/l12cy/l12cy.github.io.git
 git branch -M main
 git push -u origin main
 ```
+
+# others
