@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎨 协作白板</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --toolbar-width: 72px;
+      --header-height: 52px;
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --accent: #4f6ef7;
+      --accent-hover: #3b59e8;
+      --text: #1a1a2e;
+      --subtext: #6b7280;
+      --border: #e5e7eb;
+      --shadow: 0 2px 14px rgba(0,0,0,0.10);
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    /* ===== LOBBY OVERLAY ===== */
+    #lobby {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .lobby-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 44px;
+      width: 420px;
+      max-width: 95vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+
+    .lobby-logo {
+      text-align: center;
+      font-size: 42px;
+      margin-bottom: 6px;
+    }
+
+    .lobby-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .lobby-sub {
+      text-align: center;
+      font-size: 13px;
+      color: var(--subtext);
+      margin-bottom: 28px;
+    }
+
+    .lobby-section {
+      margin-bottom: 20px;
+    }
+
+    .lobby-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .lobby-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+
+    .lobby-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
+    }
+
+    .lobby-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--subtext);
+      font-size: 13px;
+      margin: 22px 0;
+    }
+
+    .lobby-divider::before,
+    .lobby-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .lobby-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .lobby-btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .lobby-btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .lobby-btn-primary:disabled { background: #c7d0fd; cursor: not-allowed; transform: none; }
+
+    .lobby-btn-outline {
+      background: white;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      margin-top: 10px;
+    }
+
+    .lobby-btn-outline:hover { background: #eff3fe; }
+
+    .join-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .join-row .lobby-input { flex: 1; letter-spacing: 2px; font-size: 16px; font-weight: 600; }
+    .join-row .lobby-btn { width: auto; padding: 11px 20px; font-size: 14px; }
+
+    /* 服务器状态指示 */
+    .server-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      margin-bottom: 16px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+    .server-status.online { color: #16a34a; background: #f0fdf4; border: 1px solid #86efac; }
+    .server-status.offline { color: #dc2626; background: #fef2f2; border: 1px solid #fca5a5; }
+    .server-status.checking { color: #d97706; background: #fffbeb; border: 1px solid #fcd34d; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* ===== HEADER ===== */
+    header {
+      height: var(--header-height);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .header-logo {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .room-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 13px;
+      background: #f5f7ff;
+      border: 1px solid #c7d0fd;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+      position: relative;
+    }
+
+    .room-badge:hover { background: #eff3fe; }
+
+    .room-badge-icon { font-size: 14px; }
+
+    .online-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #16a34a;
+      font-weight: 500;
+    }
+
+    .online-dot {
+      width: 7px; height: 7px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    /* WS 连接状态 */
+    .ws-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .ws-badge.connected { background: #f0fdf4; border: 1px solid #86efac; color: #16a34a; }
+    .ws-badge.disconnected { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; }
+    .ws-badge.connecting { background: #fffbeb; border: 1px solid #fcd34d; color: #d97706; }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--subtext);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+    }
+
+    .btn-danger:hover { background: #fecaca; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar {
+      width: var(--toolbar-width);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 8px;
+      gap: 2px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    }
+
+    .toolbar-divider {
+      width: 42px;
+      height: 1px;
+      background: var(--border);
+      margin: 6px 0;
+    }
+
+    .tool-item {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 2px solid transparent;
+      user-select: none;
+    }
+
+    .tool-item:hover { background: var(--bg); }
+
+    .tool-item.active {
+      background: #eff3fe;
+      border-color: var(--accent);
+    }
+
+    .tool-item.active .tool-icon,
+    .tool-item.active .tool-label { color: var(--accent); }
+
+    .tool-icon { font-size: 20px; line-height: 1; }
+    .tool-label { font-size: 9px; color: var(--subtext); margin-top: 2px; text-align: center; }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 2px 4px;
+      width: 100%;
+    }
+
+    .color-dot {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+      justify-self: center;
+    }
+
+    .color-dot:hover { transform: scale(1.25); }
+    .color-dot.active { border-color: #374151; box-shadow: 0 0 0 2px white inset; }
+
+    .custom-color-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    #customColor {
+      width: 36px; height: 22px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .stroke-options {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      width: 100%;
+      padding: 2px 4px;
+    }
+
+    .stroke-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 26px;
+      background: var(--bg);
+      border: 2px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .stroke-btn:hover { background: #e8ecfd; }
+    .stroke-btn.active { border-color: var(--accent); background: #eff3fe; }
+
+    .stroke-line {
+      background: var(--text);
+      border-radius: 99px;
+      width: 28px;
+    }
+
+    .section-label {
+      font-size: 9px;
+      color: var(--subtext);
+      letter-spacing: 0.3px;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+
+    .opacity-wrap {
+      width: 100%;
+      padding: 0 4px;
+    }
+
+    #opacitySlider {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    /* ===== CANVAS AREA ===== */
+    .canvas-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #f8f9fb;
+    }
+
+    .canvas-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, #c8cdd8 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #mainCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    #overlayCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ===== REMOTE CURSORS ===== */
+    .remote-cursor {
+      position: absolute;
+      pointer-events: none;
+      z-index: 15;
+      transition: left 0.06s linear, top 0.06s linear;
+    }
+
+    .cursor-label {
+      position: absolute;
+      top: 20px;
+      left: 8px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      color: white;
+    }
+
+    /* ===== USERS PANEL ===== */
+    .users-panel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      z-index: 20;
+      min-width: 150px;
+    }
+
+    .users-panel-title {
+      font-size: 10px;
+      color: var(--subtext);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    .user-entry {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5px;
+    }
+
+    .user-avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-info-col { display: flex; flex-direction: column; }
+    .user-name { font-size: 12px; color: var(--text); font-weight: 500; }
+    .user-you { font-size: 10px; color: var(--subtext); }
+
+    /* ===== ZOOM ===== */
+    .zoom-controls {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px 8px;
+      box-shadow: var(--shadow);
+      z-index: 20;
+    }
+
+    .zoom-btn {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      border: none;
+      background: none;
+      color: var(--text);
+      transition: background 0.12s;
+    }
+
+    .zoom-btn:hover { background: var(--bg); }
+
+    #zoomLabel {
+      font-size: 12px;
+      color: var(--subtext);
+      min-width: 40px;
+      text-align: center;
+    }
+
+    /* ===== TOAST ===== */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: white;
+      background: rgba(26,26,46,0.88);
+      backdrop-filter: blur(8px);
+      animation: toastIn 0.25s ease, toastOut 0.3s ease 2.3s forwards;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    }
+
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateY(6px); } }
+
+    /* ===== TEXT INPUT ===== */
+    #textInput {
+      position: absolute;
+      display: none;
+      border: 2px dashed var(--accent);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 16px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      background: rgba(255,255,255,0.93);
+      z-index: 50;
+      min-width: 120px;
+      min-height: 36px;
+      overflow: hidden;
+    }
+
+    /* ===== COPY TOOLTIP ===== */
+    .copy-tooltip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a2e;
+      color: white;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .room-badge:hover .copy-tooltip { opacity: 1; }
+
+    /* ===== CHAT PANEL ===== */
+    #chatPanel {
+      position: absolute;
+      width: 300px;
+      min-width: 220px;
+      min-height: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+      display: flex;
+      flex-direction: column;
+      z-index: 50;
+      overflow: hidden;
+      resize: both;
+      user-select: none;
+    }
+
+    #chatPanel.hidden { display: none; }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px 9px;
+      background: linear-gradient(135deg, #4f6ef7 0%, #7c3aed 100%);
+      cursor: move;
+      flex-shrink: 0;
+    }
+
+    .chat-header-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .chat-header-title .unread-badge {
+      background: #fbbf24;
+      color: #1a1a2e;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 99px;
+      padding: 1px 6px;
+      display: none;
+    }
+
+    .chat-header-title .unread-badge.show { display: inline; }
+
+    .chat-header-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .chat-header-btn {
+      width: 24px; height: 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      background: rgba(255,255,255,0.18);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.12s;
+    }
+
+    .chat-header-btn:hover { background: rgba(255,255,255,0.32); }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 120px;
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-width: 85%;
+    }
+
+    .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
+    .chat-msg.other { align-self: flex-start; align-items: flex-start; }
+    .chat-msg.system { align-self: center; align-items: center; max-width: 100%; }
+
+    .chat-msg-meta {
+      font-size: 10px;
+      color: var(--subtext);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chat-msg-avatar {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .chat-msg-bubble {
+      padding: 7px 11px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .chat-msg.mine .chat-msg-bubble {
+      background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-msg.other .chat-msg-bubble {
+      background: #f3f4f6;
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-msg.system .chat-msg-bubble {
+      background: transparent;
+      color: var(--subtext);
+      font-size: 11px;
+      font-style: italic;
+      padding: 3px 8px;
+    }
+
+    .chat-msg-time {
+      font-size: 9px;
+      color: #adb5bd;
+      margin-top: 1px;
+    }
+
+    .chat-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--subtext);
+      font-size: 12px;
+      gap: 6px;
+      opacity: 0.6;
+    }
+
+    .chat-input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+      padding: 8px 10px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    #chatInput {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      max-height: 80px;
+      transition: border-color 0.15s;
+      line-height: 1.4;
+    }
+
+    #chatInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,110,247,0.12); }
+
+    #chatSendBtn {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    #chatSendBtn:hover { background: var(--accent-hover); transform: scale(1.05); }
+    #chatSendBtn:disabled { background: #c7d0fd; cursor: not-allowed; transform: none; }
+
+    /* 在线成员面板底部的聊天入口按钮 */
+    #btnShowChat {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      margin-top: 10px;
+      padding: 7px 10px;
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      background: #eff3fe;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s;
+      font-family: inherit;
+    }
+
+    #btnShowChat:hover { background: #dde5fd; }
+
+    #btnShowChat .chat-btn-badge {
+      background: #ef4444;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      border-radius: 99px;
+      padding: 1px 5px;
+      display: none;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    #btnShowChat .chat-btn-badge.show { display: inline; }
+  </style>
+</head>
+<body>
+
+<!-- ===== LOBBY ===== -->
+<div id="lobby">
+  <div class="lobby-card">
+    <div class="lobby-logo">🎨</div>
+    <div class="lobby-title">协作白板</div>
+    <div class="lobby-sub">实时多人在线协作，随时随地共同创作</div>
+
+    <!-- 服务器连接状态 -->
+    <div class="server-status checking" id="serverStatus">
+      <span class="status-dot"></span>
+      <span id="serverStatusText">正在检测服务器连接…</span>
+    </div>
+
+    <div class="lobby-section">
+      <div class="lobby-label">你的昵称</div>
+      <input class="lobby-input" id="nickInput" type="text" placeholder="请输入你的昵称" maxlength="16" />
+    </div>
+
+    <button class="lobby-btn lobby-btn-primary" id="btnCreate">✨ 创建新白板</button>
+
+    <div class="lobby-divider">或者加入已有白板</div>
+
+    <div class="lobby-section">
+      <div class="lobby-label">白板 ID</div>
+      <div class="join-row">
+        <input class="lobby-input" id="joinIdInput" type="text" placeholder="输入白板 ID" maxlength="8" style="text-transform:uppercase" />
+        <button class="lobby-btn lobby-btn-primary" id="btnJoin" style="width:auto;padding:11px 20px;font-size:14px">加入</button>
+      </div>
+    </div>
+
+    <div id="lobbyError" style="color:#dc2626;font-size:13px;text-align:center;margin-top:8px;display:none;"></div>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header id="appHeader" style="display:none">
+  <div class="header-logo">🎨 <span>协作白板</span></div>
+
+  <div class="room-badge" id="roomBadge" title="点击复制房间ID">
+    <span class="room-badge-icon">🏠</span>
+    <span id="roomIdDisplay">——</span>
+    <span style="font-size:11px;color:var(--subtext)">📋</span>
+    <div class="copy-tooltip">点击复制 ID</div>
+  </div>
+
+  <div class="online-badge">
+    <div class="online-dot"></div>
+    <span id="onlineCount">1 人在线</span>
+  </div>
+
+  <!-- WebSocket 连接状态 -->
+  <div class="ws-badge connecting" id="wsBadge">
+    <span id="wsStatus">⚡ 连接中</span>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn btn-ghost" id="btnUndo">↩ 撤销</button>
+    <button class="btn btn-ghost" id="btnRedo">↪ 重做</button>
+    <button class="btn btn-ghost" id="btnSave">💾 保存</button>
+    <button class="btn btn-danger" id="btnClear">🗑 清空</button>
+    <button class="btn btn-ghost" id="btnLeave">🚪 离开</button>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<div class="main" id="appMain" style="display:none">
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+
+    <div class="tool-item active" data-tool="pen" title="画笔 (P)">
+      <div class="tool-icon">✏️</div>
+      <div class="tool-label">画笔</div>
+    </div>
+    <div class="tool-item" data-tool="highlighter" title="荧光笔 (H)">
+      <div class="tool-icon">🖌️</div>
+      <div class="tool-label">荧光</div>
+    </div>
+    <div class="tool-item" data-tool="eraser" title="橡皮擦 (E)">
+      <div class="tool-icon">🧹</div>
+      <div class="tool-label">橡皮</div>
+    </div>
+    <div class="tool-item" data-tool="select" title="移动画布 (M)">
+      <div class="tool-icon">🖱️</div>
+      <div class="tool-label">移动</div>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="tool-item" data-tool="line" title="直线 (L)">
+      <div class="tool-icon">📏</div>
+      <div class="tool-label">直线</div>
+    </div>
+    <div class="tool-item" data-tool="arrow" title="箭头 (A)">
+      <div class="tool-icon">➡️</div>
+      <div class="tool-label">箭头</div>
+    </div>
+    <div class="tool-item" data-tool="rect" title="矩形 (R)">
+      <div class="tool-icon">▭</div>
+      <div class="tool-label">矩形</div>
+    </div>
+    <div class="tool-item" data-tool="circle" title="椭圆 (C)">
+      <div class="tool-icon">⬭</div>
+      <div class="tool-label">椭圆</div>
+    </div>
+    <div class="tool-item" data-tool="text" title="文字 (T)">
+      <div class="tool-icon">🔤</div>
+      <div class="tool-label">文字</div>
+    </div>
+    <div class="tool-item" data-tool="sticky" title="便利贴 (N)">
+      <div class="tool-icon">📝</div>
+      <div class="tool-label">便贴</div>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="section-label">颜色</div>
+    <div class="color-grid">
+      <div class="color-dot active" data-color="#1a1a2e" style="background:#1a1a2e"></div>
+      <div class="color-dot" data-color="#ef4444" style="background:#ef4444"></div>
+      <div class="color-dot" data-color="#f97316" style="background:#f97316"></div>
+      <div class="color-dot" data-color="#eab308" style="background:#eab308"></div>
+      <div class="color-dot" data-color="#22c55e" style="background:#22c55e"></div>
+      <div class="color-dot" data-color="#3b82f6" style="background:#3b82f6"></div>
+      <div class="color-dot" data-color="#8b5cf6" style="background:#8b5cf6"></div>
+      <div class="color-dot" data-color="#ec4899" style="background:#ec4899"></div>
+      <div class="color-dot" data-color="#ffffff" style="background:#fff;border:1.5px solid #d1d5db"></div>
+    </div>
+    <div class="custom-color-wrap">
+      <input type="color" id="customColor" value="#1a1a2e" title="自定义颜色" />
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="section-label">粗细</div>
+    <div class="stroke-options">
+      <div class="stroke-btn active" data-size="2"><div class="stroke-line" style="height:2px"></div></div>
+      <div class="stroke-btn" data-size="4"><div class="stroke-line" style="height:4px"></div></div>
+      <div class="stroke-btn" data-size="7"><div class="stroke-line" style="height:7px"></div></div>
+      <div class="stroke-btn" data-size="12"><div class="stroke-line" style="height:12px"></div></div>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="opacity-wrap">
+      <div class="section-label" style="margin-bottom:4px">透明度</div>
+      <input type="range" id="opacitySlider" min="10" max="100" value="100" />
+    </div>
+
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div class="canvas-area" id="canvasArea">
+    <canvas id="mainCanvas"></canvas>
+    <canvas id="overlayCanvas"></canvas>
+
+    <div class="users-panel" id="usersPanel">
+      <div class="users-panel-title">在线成员</div>
+      <div id="userList"></div>
+      <button id="btnShowChat">💬 聊天 <span class="chat-btn-badge" id="chatBtnBadge"></span></button>
+    </div>
+
+    <!-- CHAT FLOATING PANEL -->
+    <div id="chatPanel" class="hidden" style="bottom:80px;right:10px;top:auto;left:auto;height:340px;">
+      <div class="chat-header" id="chatPanelHeader">
+        <div class="chat-header-title">
+          💬 聊天室
+          <span class="unread-badge" id="chatUnreadBadge"></span>
+        </div>
+        <div class="chat-header-btns">
+          <button class="chat-header-btn" id="btnChatHide" title="隐藏聊天">－</button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-empty" id="chatEmpty">
+          <span style="font-size:28px">💬</span>
+          <span>还没有消息，来打个招呼吧~</span>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" placeholder="输入消息… (Enter 发送，Shift+Enter 换行)" rows="1"></textarea>
+        <button id="chatSendBtn">➤</button>
+      </div>
+    </div>
+
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="btnZoomOut">－</button>
+      <span id="zoomLabel">100%</span>
+      <button class="zoom-btn" id="btnZoomIn">＋</button>
+      <button class="zoom-btn" id="btnZoomReset" title="重置">⌂</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast-container"></div>
+
+<textarea id="textInput"></textarea>
+
+<script>
+/* =================================================================
+   协作白板 — 前后端分离版
+   前端职责：UI 渲染 + 绘图 + 调用后端 RESTful API + WebSocket 实时协作
+   后端职责：房间管理 / 画布持久化 / 消息广播（见 server.js）
+   ================================================================= */
+
+// ── 后端配置 ──────────────────────────────────────────────────────
+//const API_BASE = `${location.protocol}//${location.hostname}:7891/api`;
+//const WS_URL   = `ws://${location.hostname}:7891`;
+const API_BASE = `http://117.72.181.117:7891/api`;
+const WS_URL   = `ws://117.72.181.117:7891`;
+
+// ── 常量 ──────────────────────────────────────────────────────────
+const USER_COLORS  = ['#4f6ef7','#f97316','#22c55e','#ec4899','#8b5cf6','#ef4444','#0ea5e9','#f59e0b'];
+const HEARTBEAT_MS = 5000;
+const CURSOR_EXPIRE_MS = 6000;
+
+// ── 运行时状态 ─────────────────────────────────────────────────────
+let roomId = null;
+let myId   = null;
+let myName = null;
+let myColor = null;
+let ws     = null;   // WebSocket 连接
+let heartbeatTimer = null;
+let members = {};    // { userId: { name, color, x, y, lastSeen } }
+let remoteCursors = {};
+
+let tool = 'pen';
+let color = '#1a1a2e';
+let strokeSize = 2;
+let opacity = 1;
+let zoom = 1;
+let drawing = false;
+let startX = 0, startY = 0, lastX = 0, lastY = 0;
+let history = [];
+let redoStack = [];
+let textPos = null;
+let stickies = [];
+
+const canvasArea    = document.getElementById('canvasArea');
+const mainCanvas    = document.getElementById('mainCanvas');
+const overlayCanvas = document.getElementById('overlayCanvas');
+const ctx  = mainCanvas.getContext('2d');
+const octx = overlayCanvas.getContext('2d');
+const textInput = document.getElementById('textInput');
+
+// ── 工具函数 ──────────────────────────────────────────────────────
+function genId(len = 8) {
+  return 'u_' + Array.from({ length: len }, () => Math.random().toString(36)[2]).join('');
+}
+
+function randomColor() {
+  return USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)];
+}
+
+function showToast(msg, duration = 2600) {
+  const tc = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), duration + 300);
+}
+
+// ── RESTful API 封装 ──────────────────────────────────────────────
+async function apiPost(path, body) {
+  const res = await fetch(API_BASE + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+
+async function apiGet(path) {
+  const res = await fetch(API_BASE + path);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+
+async function apiDelete(path, body) {
+  const res = await fetch(API_BASE + path, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+
+// ── 服务器状态检测 ─────────────────────────────────────────────────
+async function checkServerStatus() {
+  const el  = document.getElementById('serverStatus');
+  const txt = document.getElementById('serverStatusText');
+  try {
+    //const res = await fetch(`${location.protocol}//${location.hostname}:7891/`, { method: 'HEAD' });
+    const res = await fetch(`http://117.72.181.117:7891/`, { method: 'HEAD' });
+    el.className = 'server-status online';
+    txt.textContent = '服务器已连接';
+  } catch (e) {
+    el.className = 'server-status offline';
+    txt.textContent = '无法连接服务器，请先启动 node server.js';
+  }
+}
+
+checkServerStatus();
+
+// ── LOBBY ─────────────────────────────────────────────────────────
+document.getElementById('btnCreate').addEventListener('click', async () => {
+  const nick = document.getElementById('nickInput').value.trim();
+  if (!nick) { lobbyError('请先输入你的昵称'); return; }
+
+  const btn = document.getElementById('btnCreate');
+  btn.disabled = true;
+  btn.textContent = '创建中…';
+
+  try {
+    // 调用后端 API 创建房间
+    const data = await apiPost('/rooms', {});
+    enterRoom(data.roomId, nick, true);
+  } catch (e) {
+    lobbyError('创建失败：' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ 创建新白板';
+  }
+});
+
+document.getElementById('btnJoin').addEventListener('click', joinByInput);
+document.getElementById('joinIdInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') joinByInput();
+});
+document.getElementById('joinIdInput').addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase();
+});
+
+async function joinByInput() {
+  const nick = document.getElementById('nickInput').value.trim();
+  const id   = document.getElementById('joinIdInput').value.trim().toUpperCase();
+  if (!nick) { lobbyError('请先输入你的昵称'); return; }
+  if (!id || id.length < 4) { lobbyError('请输入有效的白板 ID'); return; }
+
+  const btn = document.getElementById('btnJoin');
+  btn.disabled = true;
+  btn.textContent = '验证中…';
+
+  try {
+    // 调用后端 API 验证房间是否存在
+    await apiPost(`/rooms/${id}/join`, { userId: 'check' });
+    enterRoom(id, nick, false);
+  } catch (e) {
+    lobbyError(e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '加入';
+  }
+}
+
+function lobbyError(msg) {
+  const el = document.getElementById('lobbyError');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 3500);
+}
+
+// ── 进入房间 ──────────────────────────────────────────────────────
+function enterRoom(id, nick, isCreator) {
+  roomId  = id;
+  myId    = genId();
+  myName  = nick;
+  myColor = randomColor();
+
+  // 显示应用界面
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('appHeader').style.display = 'flex';
+  document.getElementById('appMain').style.display = 'flex';
+  document.getElementById('roomIdDisplay').textContent = roomId;
+
+  resizeCanvases();
+
+  // 注册自己
+  members[myId] = { name: myName, color: myColor, x: 0, y: 0, lastSeen: Date.now() };
+  renderUserList();
+  updateOnlineCount();
+
+  // 连接 WebSocket
+  connectWebSocket();
+
+  // 心跳（通过 WS 发送）
+  heartbeatTimer = setInterval(() => {
+    wsSend({ type: 'heartbeat' });
+    pruneExpiredMembers();
+  }, HEARTBEAT_MS);
+
+  // 清理过期游标
+  setInterval(pruneExpiredCursors, 3000);
+
+  if (isCreator) {
+    showToast(`✨ 白板已创建！ID: ${roomId}`);
+    setTimeout(() => showToast('💡 把 ID 分享给协作者，他们在大厅输入即可加入'), 1500);
+  } else {
+    showToast(`🎉 已加入白板 ${roomId}`);
+  }
+}
+
+// ── WebSocket 连接 ─────────────────────────────────────────────────
+function connectWebSocket() {
+  updateWsBadge('connecting');
+
+  ws = new WebSocket(WS_URL);
+
+  ws.addEventListener('open', () => {
+    updateWsBadge('connected');
+    // 发送 join 消息，服务端会返回 init（含画布快照 + 历史消息 + 成员列表）
+    wsSend({ type: 'join', roomId, userId: myId, name: myName, color: myColor });
+  });
+
+  ws.addEventListener('message', (e) => {
+    let msg;
+    try { msg = JSON.parse(e.data); } catch { return; }
+    onWsMessage(msg);
+  });
+
+  ws.addEventListener('close', () => {
+    updateWsBadge('disconnected');
+    // 断线后尝试重连（5 秒后）
+    if (roomId) {
+      setTimeout(() => {
+        if (roomId) connectWebSocket();
+      }, 5000);
+    }
+  });
+
+  ws.addEventListener('error', () => {
+    updateWsBadge('disconnected');
+  });
+}
+
+function wsSend(data) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ ...data, userId: myId }));
+  }
+}
+
+function updateWsBadge(state) {
+  const badge = document.getElementById('wsBadge');
+  const txt   = document.getElementById('wsStatus');
+  badge.className = 'ws-badge ' + state;
+  const map = { connected: '⚡ 已连接', disconnected: '⚡ 已断开', connecting: '⚡ 连接中' };
+  txt.textContent = map[state] || state;
+}
+
+// ── WebSocket 消息处理 ─────────────────────────────────────────────
+function onWsMessage(msg) {
+  if (!msg || !msg.type) return;
+
+  switch (msg.type) {
+
+    case 'init': {
+      // 服务端推送初始数据（画布 + 历史消息 + 成员）
+      if (msg.canvas && msg.canvas.startsWith('data:image')) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+          ctx.drawImage(img, 0, 0);
+        };
+        img.src = msg.canvas;
+        showToast('📥 已加载白板内容');
+      } else {
+        // 新房间显示欢迎画面
+        drawWelcome();
+      }
+      // 加载成员列表
+      if (msg.members) {
+        msg.members.forEach(u => {
+          if (u.userId !== myId) {
+            members[u.userId] = { name: u.name, color: u.color, x: 0, y: 0, lastSeen: Date.now() };
+          }
+        });
+        renderUserList();
+        updateOnlineCount();
+      }
+      // 加载聊天历史
+      if (msg.messages && msg.messages.length > 0) {
+        msg.messages.forEach(m => {
+          appendChatMessage(m.userId, m.name, m.color, m.text, m.time, m.userId === myId);
+        });
+      }
+      break;
+    }
+
+    case 'join': {
+      if (msg.userId === myId) return;
+      members[msg.userId] = { name: msg.name, color: msg.color, x: 0, y: 0, lastSeen: Date.now() };
+      renderUserList();
+      updateOnlineCount();
+      showToast(`👋 ${msg.name} 加入了白板`);
+      appendSystemMsg(`👋 ${msg.name} 加入了白板`);
+      break;
+    }
+
+    case 'heartbeat': {
+      if (msg.userId === myId) return;
+      if (!members[msg.userId]) {
+        members[msg.userId] = { name: msg.name, color: msg.color, x: 0, y: 0, lastSeen: Date.now() };
+        renderUserList();
+        updateOnlineCount();
+      } else {
+        members[msg.userId].lastSeen = Date.now();
+      }
+      break;
+    }
+
+    case 'leave': {
+      if (msg.userId === myId) return;
+      if (members[msg.userId]) {
+        const name = members[msg.userId].name;
+        delete members[msg.userId];
+        removeCursor(msg.userId);
+        renderUserList();
+        updateOnlineCount();
+        showToast(`👋 ${name} 离开了白板`);
+        appendSystemMsg(`🚪 ${name} 离开了白板`);
+      }
+      break;
+    }
+
+    case 'cursor': {
+      if (msg.userId === myId) return;
+      if (members[msg.userId]) {
+        members[msg.userId].x = msg.x;
+        members[msg.userId].y = msg.y;
+        members[msg.userId].lastSeen = Date.now();
+        updateCursorEl(msg.userId, msg.x, msg.y);
+      }
+      break;
+    }
+
+    case 'draw': {
+      if (msg.userId === myId) return;
+      applyRemoteDraw(msg);
+      break;
+    }
+
+    case 'sync_canvas': {
+      if (msg.userId === myId) return;
+      if (msg.data && msg.data.startsWith('data:image')) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+          ctx.drawImage(img, 0, 0);
+        };
+        img.src = msg.data;
+      }
+      break;
+    }
+
+    case 'clear': {
+      if (msg.userId === myId) return;
+      ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+      history = []; redoStack = [];
+      showToast(`🗑 ${members[msg.userId]?.name || '有人'} 清空了白板`);
+      break;
+    }
+
+    case 'chat': {
+      if (msg.userId === myId) return;
+      appendChatMessage(msg.userId, msg.name, msg.color, msg.text, msg.time, false);
+      break;
+    }
+  }
+}
+
+// ── 房间 ID 复制 ──────────────────────────────────────────────────
+document.getElementById('roomBadge').addEventListener('click', () => {
+  if (!roomId) return;
+  navigator.clipboard?.writeText(roomId).then(() => showToast(`📋 ID "${roomId}" 已复制到剪贴板`));
+});
+
+// ── 远程游标 ──────────────────────────────────────────────────────
+function updateCursorEl(uid, x, y) {
+  const u = members[uid];
+  if (!u) return;
+  if (!remoteCursors[uid]) {
+    const el = document.createElement('div');
+    el.className = 'remote-cursor';
+    el.id = 'rcursor_' + uid;
+    el.innerHTML = `
+      <svg width="18" height="22" viewBox="0 0 18 22">
+        <polygon points="2,2 2,18 7,13 10,20 12,19 9,12 16,11" fill="${u.color}" stroke="white" stroke-width="1.5"/>
+      </svg>
+      <div class="cursor-label" style="background:${u.color}">${u.name}</div>`;
+    canvasArea.appendChild(el);
+    remoteCursors[uid] = el;
+  }
+  remoteCursors[uid].style.left = x + 'px';
+  remoteCursors[uid].style.top  = y + 'px';
+  remoteCursors[uid]._lastSeen = Date.now();
+}
+
+function removeCursor(uid) {
+  if (remoteCursors[uid]) {
+    remoteCursors[uid].remove();
+    delete remoteCursors[uid];
+  }
+}
+
+function pruneExpiredCursors() {
+  const now = Date.now();
+  Object.keys(remoteCursors).forEach(uid => {
+    if (now - (remoteCursors[uid]._lastSeen || 0) > CURSOR_EXPIRE_MS) {
+      removeCursor(uid);
+    }
+  });
+}
+
+function pruneExpiredMembers() {
+  const now = Date.now();
+  Object.keys(members).forEach(uid => {
+    if (uid === myId) return;
+    if (now - members[uid].lastSeen > HEARTBEAT_MS * 4) {
+      const name = members[uid].name;
+      delete members[uid];
+      removeCursor(uid);
+      renderUserList();
+      updateOnlineCount();
+      showToast(`⚠️ ${name} 已断开连接`);
+    }
+  });
+}
+
+// ── 用户列表 ──────────────────────────────────────────────────────
+function renderUserList() {
+  const list = document.getElementById('userList');
+  list.innerHTML = '';
+
+  const meEl = document.createElement('div');
+  meEl.className = 'user-entry';
+  meEl.innerHTML = `
+    <div class="user-avatar" style="background:${myColor}">${myName[0].toUpperCase()}</div>
+    <div class="user-info-col">
+      <div class="user-name">${myName}</div>
+      <div class="user-you">（我）</div>
+    </div>`;
+  list.appendChild(meEl);
+
+  Object.entries(members).forEach(([uid, u]) => {
+    if (uid === myId) return;
+    const el = document.createElement('div');
+    el.className = 'user-entry';
+    el.innerHTML = `
+      <div class="user-avatar" style="background:${u.color}">${u.name[0].toUpperCase()}</div>
+      <div class="user-name">${u.name}</div>`;
+    list.appendChild(el);
+  });
+}
+
+function updateOnlineCount() {
+  const count = Object.keys(members).length;
+  document.getElementById('onlineCount').textContent = count + ' 人在线';
+}
+
+// ── 离开 ──────────────────────────────────────────────────────────
+document.getElementById('btnLeave').addEventListener('click', () => {
+  if (!confirm('确认离开当前白板？')) return;
+  leaveRoom();
+});
+
+function leaveRoom() {
+  wsSend({ type: 'leave' });
+  clearInterval(heartbeatTimer);
+  ws?.close();
+  ws = null;
+  members = {};
+  remoteCursors = {};
+  roomId = null;
+  ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+  history = []; redoStack = [];
+  stickies.forEach(s => s.el.remove());
+  stickies = [];
+  resetChat();
+  document.getElementById('lobby').style.display = 'flex';
+  document.getElementById('appHeader').style.display = 'none';
+  document.getElementById('appMain').style.display = 'none';
+  document.getElementById('nickInput').value = '';
+  document.getElementById('joinIdInput').value = '';
+  // 重新检查服务器状态
+  checkServerStatus();
+}
+
+window.addEventListener('beforeunload', () => {
+  if (ws) wsSend({ type: 'leave' });
+});
+
+// ── Canvas 尺寸 ───────────────────────────────────────────────────
+function resizeCanvases() {
+  const w = canvasArea.clientWidth;
+  const h = canvasArea.clientHeight;
+  const imgData = ctx.getImageData(0, 0, mainCanvas.width || w, mainCanvas.height || h);
+  mainCanvas.width = w; mainCanvas.height = h;
+  overlayCanvas.width = w; overlayCanvas.height = h;
+  try { ctx.putImageData(imgData, 0, 0); } catch(e) {}
+}
+
+window.addEventListener('resize', resizeCanvases);
+
+// ── 绘图工具选择 ──────────────────────────────────────────────────
+document.querySelectorAll('.tool-item[data-tool]').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelector('.tool-item.active')?.classList.remove('active');
+    el.classList.add('active');
+    tool = el.dataset.tool;
+    updateCursorStyle();
+    if (tool !== 'text' && textInput.style.display !== 'none') commitText();
+  });
+});
+
+function updateCursorStyle() {
+  const map = {
+    pen: 'crosshair', highlighter: 'crosshair',
+    eraser: 'cell', select: 'grab',
+    line: 'crosshair', arrow: 'crosshair',
+    rect: 'crosshair', circle: 'crosshair',
+    text: 'text', sticky: 'copy',
+  };
+  mainCanvas.style.cursor = map[tool] || 'crosshair';
+}
+
+// ── 颜色 ──────────────────────────────────────────────────────────
+document.querySelectorAll('.color-dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    document.querySelector('.color-dot.active')?.classList.remove('active');
+    dot.classList.add('active');
+    color = dot.dataset.color;
+    document.getElementById('customColor').value = color;
+  });
+});
+
+document.getElementById('customColor').addEventListener('input', e => {
+  color = e.target.value;
+  document.querySelector('.color-dot.active')?.classList.remove('active');
+});
+
+// ── 笔刷粗细 ──────────────────────────────────────────────────────
+document.querySelectorAll('.stroke-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelector('.stroke-btn.active')?.classList.remove('active');
+    btn.classList.add('active');
+    strokeSize = parseInt(btn.dataset.size);
+  });
+});
+
+// ── 透明度 ────────────────────────────────────────────────────────
+document.getElementById('opacitySlider').addEventListener('input', e => {
+  opacity = e.target.value / 100;
+});
+
+// ── 鼠标/触摸事件 ─────────────────────────────────────────────────
+mainCanvas.addEventListener('mousedown', onPointerDown);
+mainCanvas.addEventListener('mousemove', onPointerMove);
+mainCanvas.addEventListener('mouseup', onPointerUp);
+mainCanvas.addEventListener('mouseleave', () => {
+  drawing = false;
+  octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+});
+mainCanvas.addEventListener('touchstart', e => { e.preventDefault(); onPointerDown(e); }, { passive: false });
+mainCanvas.addEventListener('touchmove',  e => { e.preventDefault(); onPointerMove(e); }, { passive: false });
+mainCanvas.addEventListener('touchend',   e => { e.preventDefault(); onPointerUp(e);   }, { passive: false });
+
+function getPos(e) {
+  const t = e.touches?.[0] || e;
+  return { x: (t.clientX - mainCanvas.getBoundingClientRect().left) / zoom,
+           y: (t.clientY - mainCanvas.getBoundingClientRect().top)  / zoom };
+}
+
+function setStyle(c, isHL = false) {
+  c.globalAlpha  = isHL ? opacity * 0.4 : opacity;
+  c.strokeStyle  = color;
+  c.fillStyle    = color;
+  c.lineWidth    = strokeSize;
+  c.lineCap      = 'round';
+  c.lineJoin     = 'round';
+}
+
+// ── 绘图核心 ──────────────────────────────────────────────────────
+function onPointerDown(e) {
+  if (e.button === 2) return;
+  if (!roomId) return;
+  const pos = getPos(e);
+  drawing = true;
+  startX = pos.x; startY = pos.y;
+  lastX  = pos.x; lastY  = pos.y;
+
+  if (tool === 'pen' || tool === 'highlighter') {
+    ctx.save(); ctx.scale(zoom, zoom);
+    setStyle(ctx, tool === 'highlighter');
+    ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+    ctx.restore();
+  }
+  if (tool === 'eraser') { applyEraser(pos.x * zoom, pos.y * zoom); }
+  if (tool === 'text')   { handleTextClick(pos); drawing = false; }
+  if (tool === 'sticky') { addSticky(pos.x, pos.y); drawing = false; }
+}
+
+function onPointerMove(e) {
+  if (!roomId) return;
+  const pos = getPos(e);
+  const t = e.touches?.[0] || e;
+
+  // 广播游标位置（通过 WebSocket）
+  wsSend({
+    type: 'cursor',
+    x: t.clientX - canvasArea.getBoundingClientRect().left,
+    y: t.clientY - canvasArea.getBoundingClientRect().top,
+  });
+
+  if (!drawing) return;
+
+  if (tool === 'pen' || tool === 'highlighter') {
+    ctx.save(); ctx.scale(zoom, zoom);
+    setStyle(ctx, tool === 'highlighter');
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(pos.x, pos.y); ctx.stroke();
+    ctx.restore();
+    lastX = pos.x; lastY = pos.y;
+    return;
+  }
+
+  if (tool === 'eraser') {
+    applyEraser(pos.x * zoom, pos.y * zoom);
+    lastX = pos.x; lastY = pos.y;
+    return;
+  }
+
+  // 形状预览
+  octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+  octx.save(); octx.scale(zoom, zoom); setStyle(octx);
+  const dx = pos.x - startX, dy = pos.y - startY;
+  if (tool === 'line') {
+    octx.beginPath(); octx.moveTo(startX, startY); octx.lineTo(pos.x, pos.y); octx.stroke();
+  } else if (tool === 'arrow') {
+    drawArrow(octx, startX, startY, pos.x, pos.y);
+  } else if (tool === 'rect') {
+    octx.strokeRect(startX, startY, dx, dy);
+  } else if (tool === 'circle') {
+    octx.beginPath();
+    octx.ellipse(startX + dx/2, startY + dy/2, Math.abs(dx/2), Math.abs(dy/2), 0, 0, Math.PI*2);
+    octx.stroke();
+  }
+  octx.restore();
+}
+
+function onPointerUp(e) {
+  if (!drawing) return;
+  drawing = false;
+  octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+  if (!roomId) return;
+
+  const pos = getPos(e);
+  const dx = pos.x - startX, dy = pos.y - startY;
+
+  ctx.save(); ctx.scale(zoom, zoom); setStyle(ctx);
+  let drawCmd = null;
+
+  if (tool === 'line') {
+    ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(pos.x, pos.y); ctx.stroke();
+    drawCmd = { shape: 'line', x1: startX, y1: startY, x2: pos.x, y2: pos.y };
+  } else if (tool === 'arrow') {
+    drawArrow(ctx, startX, startY, pos.x, pos.y);
+    drawCmd = { shape: 'arrow', x1: startX, y1: startY, x2: pos.x, y2: pos.y };
+  } else if (tool === 'rect') {
+    ctx.strokeRect(startX, startY, dx, dy);
+    drawCmd = { shape: 'rect', x: startX, y: startY, w: dx, h: dy };
+  } else if (tool === 'circle') {
+    ctx.beginPath();
+    ctx.ellipse(startX + dx/2, startY + dy/2, Math.abs(dx/2), Math.abs(dy/2), 0, 0, Math.PI*2);
+    ctx.stroke();
+    drawCmd = { shape: 'circle', cx: startX + dx/2, cy: startY + dy/2, rx: Math.abs(dx/2), ry: Math.abs(dy/2) };
+  }
+  ctx.restore();
+
+  if (drawCmd) {
+    saveHistory();
+    wsSend({ type: 'draw', ...drawCmd, color, strokeSize, opacity, zoom });
+  }
+}
+
+function applyEraser(cx, cy) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath(); ctx.arc(cx, cy, strokeSize * 4, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function drawArrow(c, x1, y1, x2, y2) {
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const hl = Math.max(14, strokeSize * 5);
+  c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+  c.beginPath();
+  c.moveTo(x2, y2);
+  c.lineTo(x2 - hl * Math.cos(angle - Math.PI/6), y2 - hl * Math.sin(angle - Math.PI/6));
+  c.lineTo(x2 - hl * Math.cos(angle + Math.PI/6), y2 - hl * Math.sin(angle + Math.PI/6));
+  c.closePath(); c.fillStyle = c.strokeStyle; c.fill();
+}
+
+// ── 应用远端绘图 ──────────────────────────────────────────────────
+function applyRemoteDraw(msg) {
+  const z = msg.zoom || 1;
+  ctx.save(); ctx.scale(z, z);
+  ctx.globalAlpha = msg.opacity ?? 1;
+  ctx.strokeStyle = msg.color;
+  ctx.fillStyle   = msg.color;
+  ctx.lineWidth   = msg.strokeSize;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  if (msg.shape === 'line') {
+    ctx.beginPath(); ctx.moveTo(msg.x1, msg.y1); ctx.lineTo(msg.x2, msg.y2); ctx.stroke();
+  } else if (msg.shape === 'arrow') {
+    const hl = Math.max(14, msg.strokeSize * 5);
+    const angle = Math.atan2(msg.y2 - msg.y1, msg.x2 - msg.x1);
+    ctx.beginPath(); ctx.moveTo(msg.x1, msg.y1); ctx.lineTo(msg.x2, msg.y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(msg.x2, msg.y2);
+    ctx.lineTo(msg.x2 - hl * Math.cos(angle - Math.PI/6), msg.y2 - hl * Math.sin(angle - Math.PI/6));
+    ctx.lineTo(msg.x2 - hl * Math.cos(angle + Math.PI/6), msg.y2 - hl * Math.sin(angle + Math.PI/6));
+    ctx.closePath(); ctx.fill();
+  } else if (msg.shape === 'rect') {
+    ctx.strokeRect(msg.x, msg.y, msg.w, msg.h);
+  } else if (msg.shape === 'circle') {
+    ctx.beginPath();
+    ctx.ellipse(msg.cx, msg.cy, msg.rx, msg.ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ── 画笔/橡皮完成后同步画布快照 ──────────────────────────────────
+mainCanvas.addEventListener('mouseup', () => {
+  if ((tool === 'pen' || tool === 'highlighter' || tool === 'eraser') && roomId) {
+    saveHistory();
+    // 通过 WS 广播完整画布快照
+    wsSend({ type: 'sync_canvas', data: mainCanvas.toDataURL() });
+  }
+});
+
+// ── 文字工具 ──────────────────────────────────────────────────────
+function handleTextClick(pos) {
+  if (textInput.style.display !== 'none') commitText();
+  textPos = pos;
+  textInput.style.display = 'block';
+  textInput.style.left = (pos.x * zoom + canvasArea.offsetLeft) + 'px';
+  textInput.style.top  = (pos.y * zoom + canvasArea.offsetTop)  + 'px';
+  textInput.style.fontSize = Math.max(14, strokeSize * 5) + 'px';
+  textInput.style.color = color;
+  textInput.value = '';
+  setTimeout(() => textInput.focus(), 10);
+}
+
+function commitText() {
+  const text = textInput.value.trim();
+  if (text && textPos) {
+    ctx.save(); ctx.scale(zoom, zoom);
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = color;
+    ctx.font = `${Math.max(14, strokeSize * 5)}px Segoe UI, PingFang SC, sans-serif`;
+    text.split('\n').forEach((line, i) => {
+      ctx.fillText(line, textPos.x, textPos.y + i * Math.max(18, strokeSize * 6));
+    });
+    ctx.restore();
+    saveHistory();
+    wsSend({ type: 'sync_canvas', data: mainCanvas.toDataURL() });
+  }
+  textInput.style.display = 'none';
+  textInput.value = '';
+  textPos = null;
+}
+
+textInput.addEventListener('blur', commitText);
+textInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { textInput.style.display = 'none'; textInput.value = ''; textPos = null; }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitText(); }
+  e.stopPropagation();
+});
+
+// ── 便利贴 ────────────────────────────────────────────────────────
+function addSticky(x, y) {
+  const bgs = ['#fef9c3','#dcfce7','#dbeafe','#fce7f3','#ede9fe'];
+  const bg = bgs[Math.floor(Math.random() * bgs.length)];
+  const id = 'sticky_' + Date.now();
+  const el = document.createElement('div');
+  el.id = id;
+  Object.assign(el.style, {
+    position: 'absolute', left: (x * zoom) + 'px', top: (y * zoom) + 'px',
+    width: '160px', minHeight: '100px', background: bg,
+    borderRadius: '4px', boxShadow: '3px 3px 10px rgba(0,0,0,0.15)',
+    padding: '10px', fontSize: '13px', zIndex: '30', cursor: 'move',
+    resize: 'both', overflow: 'auto',
+  });
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:10px;color:#555;font-weight:600">📝</span>
+      <span style="cursor:pointer;color:#888;font-size:14px" onclick="this.closest('[id]').remove()">✕</span>
+    </div>
+    <div contenteditable="true" style="outline:none;min-height:60px;font-size:13px;line-height:1.5">点击编辑...</div>`;
+  makeDraggable(el);
+  canvasArea.appendChild(el);
+  el.querySelector('[contenteditable]').focus();
+  stickies.push({ id, el });
+}
+
+function makeDraggable(el) {
+  let ox = 0, oy = 0, mx = 0, my = 0;
+  el.addEventListener('mousedown', e => {
+    if (e.target.hasAttribute('contenteditable') || e.target.tagName === 'SPAN') return;
+    e.preventDefault();
+    mx = e.clientX; my = e.clientY;
+    ox = parseInt(el.style.left); oy = parseInt(el.style.top);
+    const mmove = ev => { el.style.left = (ox + ev.clientX - mx) + 'px'; el.style.top = (oy + ev.clientY - my) + 'px'; };
+    const mup   = () => { document.removeEventListener('mousemove', mmove); document.removeEventListener('mouseup', mup); };
+    document.addEventListener('mousemove', mmove);
+    document.addEventListener('mouseup', mup);
+  });
+}
+
+// ── 撤销/重做 ─────────────────────────────────────────────────────
+function saveHistory() {
+  history.push(mainCanvas.toDataURL());
+  if (history.length > 50) history.shift();
+  redoStack = [];
+}
+
+document.getElementById('btnUndo').addEventListener('click', undo);
+document.getElementById('btnRedo').addEventListener('click', redo);
+
+function undo() {
+  if (!history.length) return showToast('没有可撤销的操作');
+  redoStack.push(mainCanvas.toDataURL());
+  const prev = history.pop();
+  const img = new Image();
+  img.onload = () => { ctx.clearRect(0,0,mainCanvas.width,mainCanvas.height); ctx.drawImage(img,0,0); wsSend({ type:'sync_canvas', data: mainCanvas.toDataURL() }); };
+  img.src = prev;
+  showToast('已撤销');
+}
+
+function redo() {
+  if (!redoStack.length) return showToast('没有可重做的操作');
+  history.push(mainCanvas.toDataURL());
+  const next = redoStack.pop();
+  const img = new Image();
+  img.onload = () => { ctx.clearRect(0,0,mainCanvas.width,mainCanvas.height); ctx.drawImage(img,0,0); wsSend({ type:'sync_canvas', data: mainCanvas.toDataURL() }); };
+  img.src = next;
+  showToast('已重做');
+}
+
+// ── 清空 ──────────────────────────────────────────────────────────
+document.getElementById('btnClear').addEventListener('click', async () => {
+  if (!confirm('确认清空白板？所有人都会看到变化。')) return;
+  saveHistory();
+  ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+  stickies.forEach(s => s.el.remove());
+  stickies = [];
+  // 通过 WS 广播清空命令（服务端也会清除持久化数据）
+  wsSend({ type: 'clear' });
+  showToast('白板已清空');
+});
+
+// ── 保存 ──────────────────────────────────────────────────────────
+document.getElementById('btnSave').addEventListener('click', () => {
+  const tmp = document.createElement('canvas');
+  tmp.width = mainCanvas.width; tmp.height = mainCanvas.height;
+  const tc = tmp.getContext('2d');
+  tc.fillStyle = '#ffffff';
+  tc.fillRect(0, 0, tmp.width, tmp.height);
+  tc.drawImage(mainCanvas, 0, 0);
+  const link = document.createElement('a');
+  link.download = `whiteboard-${roomId}-${new Date().toISOString().slice(0,10)}.png`;
+  link.href = tmp.toDataURL('image/png');
+  link.click();
+  showToast('💾 已保存为 PNG');
+});
+
+// ── 缩放 ──────────────────────────────────────────────────────────
+function setZoom(z) {
+  zoom = Math.min(4, Math.max(0.25, z));
+  mainCanvas.style.transform = `scale(${zoom})`;
+  mainCanvas.style.transformOrigin = '0 0';
+  overlayCanvas.style.transform = `scale(${zoom})`;
+  overlayCanvas.style.transformOrigin = '0 0';
+  document.getElementById('zoomLabel').textContent = Math.round(zoom * 100) + '%';
+}
+
+document.getElementById('btnZoomIn').addEventListener('click', () => setZoom(zoom + 0.1));
+document.getElementById('btnZoomOut').addEventListener('click', () => setZoom(zoom - 0.1));
+document.getElementById('btnZoomReset').addEventListener('click', () => setZoom(1));
+mainCanvas.addEventListener('wheel', e => { e.preventDefault(); setZoom(zoom + (e.deltaY < 0 ? 0.05 : -0.05)); }, { passive: false });
+
+// ── 键盘快捷键 ────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target === textInput || e.target.hasAttribute('contenteditable')) return;
+  const map = { p:'pen', h:'highlighter', e:'eraser', m:'select', l:'line', a:'arrow', r:'rect', c:'circle', t:'text', n:'sticky' };
+  const k = e.key.toLowerCase();
+  if (map[k] && !e.ctrlKey && !e.metaKey) {
+    document.querySelector(`[data-tool="${map[k]}"]`)?.click();
+  }
+  if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); undo(); }
+  if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); redo(); }
+  if ((e.ctrlKey || e.metaKey) && k === 's') { e.preventDefault(); document.getElementById('btnSave').click(); }
+});
+
+// ── 欢迎画面 ──────────────────────────────────────────────────────
+function drawWelcome() {
+  const W = mainCanvas.width, H = mainCanvas.height;
+  ctx.save();
+  ctx.globalAlpha = 0.1;
+  ctx.font = `bold ${Math.min(W, H) * 0.11}px Segoe UI`;
+  ctx.fillStyle = '#4f6ef7';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🎨 协作白板', W / 2, H / 2 - 22);
+  ctx.font = `${Math.min(W, H) * 0.035}px Segoe UI`;
+  ctx.fillStyle = '#6b7280';
+  ctx.fillText('选择工具开始创作，邀请协作者输入 ID 即可同步', W / 2, H / 2 + 36);
+  ctx.restore();
+}
+
+// ── 聊天面板 ──────────────────────────────────────────────────────
+const chatPanel       = document.getElementById('chatPanel');
+const chatMessages    = document.getElementById('chatMessages');
+const chatInput       = document.getElementById('chatInput');
+const chatSendBtn     = document.getElementById('chatSendBtn');
+const chatEmpty       = document.getElementById('chatEmpty');
+const chatUnreadBadge = document.getElementById('chatUnreadBadge');
+const chatBtnBadge    = document.getElementById('chatBtnBadge');
+
+let chatUnread  = 0;
+let chatVisible = false;
+
+function showChatPanel() {
+  chatPanel.classList.remove('hidden');
+  chatVisible = true;
+  chatUnread = 0;
+  chatUnreadBadge.textContent = '';
+  chatUnreadBadge.classList.remove('show');
+  chatBtnBadge.textContent = '';
+  chatBtnBadge.classList.remove('show');
+  setTimeout(() => scrollChatBottom(), 50);
+  chatInput.focus();
+}
+
+function hideChatPanel() {
+  chatPanel.classList.add('hidden');
+  chatVisible = false;
+}
+
+document.getElementById('btnShowChat').addEventListener('click', () => {
+  chatVisible ? hideChatPanel() : showChatPanel();
+});
+
+document.getElementById('btnChatHide').addEventListener('click', hideChatPanel);
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+function appendChatMessage(uid, name, uColor, text, ts, isMine) {
+  if (chatEmpty) chatEmpty.style.display = 'none';
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-msg ' + (isMine ? 'mine' : 'other');
+  if (!isMine) {
+    wrap.innerHTML = `
+      <div class="chat-msg-meta">
+        <span class="chat-msg-avatar" style="background:${uColor}">${name[0].toUpperCase()}</span>
+        <span>${escHtml(name)}</span>
+      </div>
+      <div class="chat-msg-bubble">${escHtml(text)}</div>
+      <div class="chat-msg-time">${fmtTime(ts)}</div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="chat-msg-bubble">${escHtml(text)}</div>
+      <div class="chat-msg-time">${fmtTime(ts)}</div>`;
+  }
+  chatMessages.appendChild(wrap);
+  scrollChatBottom();
+  if (!isMine && !chatVisible) {
+    chatUnread++;
+    chatUnreadBadge.textContent = chatUnread > 99 ? '99+' : chatUnread;
+    chatUnreadBadge.classList.add('show');
+    chatBtnBadge.textContent = chatUnread > 99 ? '99+' : chatUnread;
+    chatBtnBadge.classList.add('show');
+  }
+}
+
+function appendSystemMsg(text) {
+  if (chatEmpty) chatEmpty.style.display = 'none';
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-msg system';
+  wrap.innerHTML = `<div class="chat-msg-bubble">${escHtml(text)}</div>`;
+  chatMessages.appendChild(wrap);
+  scrollChatBottom();
+}
+
+function scrollChatBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// 发送聊天消息（通过 WebSocket）
+function sendChatMessage() {
+  if (!roomId) return;
+  const text = chatInput.value.trim();
+  if (!text) return;
+  const ts = Date.now();
+  // 本地先显示
+  appendChatMessage(myId, myName, myColor, text, ts, true);
+  // 通过 WS 发送（服务端会存储并广播给其他人）
+  wsSend({ type: 'chat', text, time: ts });
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+}
+
+chatSendBtn.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', e => {
+  e.stopPropagation();
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+});
+chatInput.addEventListener('input', () => {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 80) + 'px';
+});
+
+// ── 聊天面板拖动 ──────────────────────────────────────────────────
+(function initChatDrag() {
+  const header = document.getElementById('chatPanelHeader');
+  let dragging = false, startX, startY, origLeft, origTop;
+
+  function ensurePos() {
+    if (!chatPanel.style.left || chatPanel.style.left === 'auto') {
+      const rect = chatPanel.getBoundingClientRect();
+      const areaRect = canvasArea.getBoundingClientRect();
+      chatPanel.style.left   = (rect.left - areaRect.left) + 'px';
+      chatPanel.style.top    = (rect.top  - areaRect.top)  + 'px';
+      chatPanel.style.right  = 'auto';
+      chatPanel.style.bottom = 'auto';
+    }
+  }
+
+  header.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('chat-header-btn')) return;
+    dragging = true; ensurePos();
+    startX = e.clientX; startY = e.clientY;
+    origLeft = parseInt(chatPanel.style.left) || 0;
+    origTop  = parseInt(chatPanel.style.top)  || 0;
+    document.body.style.userSelect = 'none';
+
+    const onMove = ev => {
+      if (!dragging) return;
+      const areaRect = canvasArea.getBoundingClientRect();
+      let newLeft = origLeft + (ev.clientX - startX);
+      let newTop  = origTop  + (ev.clientY - startY);
+      newLeft = Math.max(0, Math.min(newLeft, areaRect.width  - chatPanel.offsetWidth));
+      newTop  = Math.max(0, Math.min(newTop,  areaRect.height - chatPanel.offsetHeight));
+      chatPanel.style.left = newLeft + 'px';
+      chatPanel.style.top  = newTop  + 'px';
+    };
+
+    const onUp = () => {
+      dragging = false;
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+})();
+
+// ── 重置聊天 ──────────────────────────────────────────────────────
+function resetChat() {
+  chatMessages.innerHTML = '';
+  chatMessages.appendChild(chatEmpty);
+  chatEmpty.style.display = '';
+  chatUnread = 0;
+  chatUnreadBadge.textContent = '';
+  chatUnreadBadge.classList.remove('show');
+  chatBtnBadge.textContent = '';
+  chatBtnBadge.classList.remove('show');
+  hideChatPanel();
+}
+
+</script>
+</body>
+</html>
