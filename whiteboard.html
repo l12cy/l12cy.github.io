@@ -1085,8 +1085,8 @@
 // ── 后端配置 ──────────────────────────────────────────────────────
 //const API_BASE = `${location.protocol}//${location.hostname}:7891/api`;
 //const WS_URL   = `ws://${location.hostname}:7891`;
-const API_BASE = `http://117.72.181.117/whiteboard/api`;
-const WS_URL   = `ws://117.72.181.117/whiteboard`;
+const API_BASE = `https://117.72.181.117:7893/api`;
+const WS_URL   = `ws://117.72.181.117:7893`;
 
 // ── 常量 ──────────────────────────────────────────────────────────
 const USER_COLORS  = ['#4f6ef7','#f97316','#22c55e','#ec4899','#8b5cf6','#ef4444','#0ea5e9','#f59e0b'];
@@ -1176,7 +1176,7 @@ async function checkServerStatus() {
   const txt = document.getElementById('serverStatusText');
   try {
     //const res = await fetch(`${location.protocol}//${location.hostname}:7891/`, { method: 'HEAD' });
-    const res = await fetch(`http://117.72.181.117/whiteboard/`, { method: 'HEAD' });
+    const res = await fetch(`https://117.72.181.117:7893/`, { method: 'HEAD' });
     el.className = 'server-status online';
     txt.textContent = '服务器已连接';
   } catch (e) {
